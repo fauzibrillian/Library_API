@@ -142,3 +142,30 @@ func (us *UserService) UpdateUser(token *golangjwt.Token, input user.User) (user
 	}
 	return respons, nil
 }
+
+// HapusUser implements user.Service.
+func (us *UserService) DeleteUser(token *golangjwt.Token, userID uint) error {
+	userId, rolesUser, err := jwt.ExtractToken(token)
+	if err != nil {
+		return errors.New("harap login")
+	}
+	if rolesUser == "" {
+		return errors.New("you don't have permission to delete this user")
+	}
+	if rolesUser != "admin" && userId != userID {
+		return errors.New("you don't have permission to delete this user")
+	}
+	exitingUser, err := us.repo.GetUserByID(userID)
+	if err != nil {
+		return errors.New("failed to retrieve the user for deletion")
+	}
+	if exitingUser.ID != userId && rolesUser != "admin" {
+		return errors.New("you don't have permission to delete this user")
+	}
+	err = us.repo.DeleteUser(userID)
+	if err != nil {
+		return errors.New("failed to delete the user")
+	}
+
+	return nil
+}

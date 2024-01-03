@@ -150,3 +150,18 @@ func (uq *UserQuery) UpdateUser(input user.User) (user.User, error) {
 
 	return result, nil
 }
+
+// DeleteUser implements user.Repository.
+func (uq *UserQuery) DeleteUser(userID uint) error {
+	var exitingUser UserModel
+
+	if err := uq.db.First(&exitingUser, userID).Error; err != nil {
+		return err
+	}
+
+	if err := uq.db.Delete(&exitingUser).Error; err != nil {
+		return err
+	}
+
+	return nil
+}
