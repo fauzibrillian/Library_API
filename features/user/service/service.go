@@ -4,7 +4,10 @@ import (
 	"errors"
 	"library_api/features/user"
 	"library_api/helper/enkrip"
+	"library_api/helper/jwt"
 	"strings"
+
+	golangjwt "github.com/golang-jwt/jwt/v5"
 )
 
 type UserService struct {
@@ -71,4 +74,46 @@ func (us *UserService) Register(newUser user.User) (user.User, error) {
 	}
 
 	return result, nil
+}
+
+// ResetPassword implements user.Service.
+func (us *UserService) ResetPassword(token *golangjwt.Token, input user.User) (user.User, error) {
+	userID, rolesUser, err := jwt.ExtractToken(token)
+	if err != nil {
+		return user.User{}, errors.New("harap login")
+	}
+
+	if userID != input.ID && rolesUser != "admin" {
+		return user.User{}, errors.New("id tidak cocok")
+	}
+
+	base, err := us.repo.GetUserByID(userID)
+	if err != nil {
+		return user.User{}, errors.New("user tidak ditemukan")
+	}
+	if input.Password != "" && rolesUser != "admin" {
+		err = us.hash.Compare(base.Password, input.Password)
+
+		if err != nil {
+			return user.User{}, errors.New("password salah")
+		}
+	}
+
+	if input.NewPassword != "" {
+		if input.Password == "" && rolesUser != "admin" {
+			return user.User{}, errors.New("masukkan password yang lama")
+		}
+		newpass, err := us.hash.HashPassword(input.NewPassword)
+		if err != nil {
+			return user.User{}, errors.New("masukkan password baru dengan benar")
+		}
+		input.NewPassword = newpass
+	}
+
+	respons, err := us.repo.ResetPassword(input)
+	if err != nil {
+
+		return user.User{}, errors.New("kesalahan pada database")
+	}
+	return respons, nil
 }
