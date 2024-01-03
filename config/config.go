@@ -8,11 +8,15 @@ import (
 )
 
 type AppConfig struct {
-	DBUSER string
-	DBHOST string
-	DBPASS string
-	DBNAME string
-	DBPORT uint
+	DBUSER            string
+	DBHOST            string
+	DBPASS            string
+	DBNAME            string
+	DBPORT            uint
+	CLOUDINARY_CLD    string
+	CLOUDINARY_KEY    string
+	CLOUDINARY_SECRET string
+	CLOUDINARY_FOLDER string
 }
 
 func InitConfig() *AppConfig {
@@ -71,6 +75,26 @@ func readEnv() *AppConfig {
 
 	if val, found := os.LookupEnv("DBNAME"); found {
 		data.DBNAME = val
+	} else {
+		permit = false
+	}
+	if val, found := os.LookupEnv("CLOUDINARY_CLD"); found {
+		data.CLOUDINARY_CLD = val
+	} else {
+		permit = false
+	}
+	if val, found := os.LookupEnv("CLOUDINARY_KEY"); found {
+		data.CLOUDINARY_KEY = val
+	} else {
+		permit = false
+	}
+	if val, found := os.LookupEnv("CLOUDINARY_SECRET"); found {
+		data.CLOUDINARY_SECRET = val
+	} else {
+		permit = false
+	}
+	if val, found := os.LookupEnv("CLOUDINARY_FOLDER"); found {
+		data.CLOUDINARY_FOLDER = val
 	} else {
 		permit = false
 	}

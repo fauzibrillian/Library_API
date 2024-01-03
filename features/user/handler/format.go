@@ -24,3 +24,28 @@ type RegisterResponse struct {
 	Name  string `json:"name"`
 	Phone string `json:"phone"`
 }
+
+type ResetPasswordRequest struct {
+	ID          uint   `json:"user_id" form:"user_id"`
+	Password    string `json:"password" form:"password"`
+	NewPassword string `json:"newpassword" form:"newpassword"`
+}
+
+type ResetPasswordResponse struct {
+	ID   uint   `json:"user_id" form:"user_id"`
+	Name string `json:"name" form:"name"`
+}
+
+type PutUserRequest struct {
+	ID     uint   `json:"user_id" form:"user_id"`
+	Name   string `json:"name" form:"name"`
+	Phone  string `json:"phone" form:"phone"`
+	Avatar string `json:"avatar" form:"avatar"`
+}
+
+type PutUserResponse struct {
+	ID     uint   `json:"user_id" form:"user_id"`
+	Name   string `json:"name" form:"name"`
+	Phone  string `json:"phone" form:"phone"`
+	Avatar string `json:"avatar" form:"avatar"`
+}
