@@ -42,3 +42,20 @@ func (uq *UserQuery) Login(phone string) (user.User, error) {
 
 	return *result, nil
 }
+
+// Register implements user.Repository.
+func (uq *UserQuery) Register(newUser user.User) (user.User, error) {
+	var inputDB = new(UserModel)
+	inputDB.Name = newUser.Name
+	inputDB.Phone = newUser.Phone
+	inputDB.Password = newUser.Password
+	inputDB.Role = "user"
+
+	if err := uq.db.Create(&inputDB).Error; err != nil {
+		return user.User{}, err
+	}
+
+	newUser.ID = inputDB.ID
+
+	return newUser, nil
+}

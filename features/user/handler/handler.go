@@ -59,12 +59,49 @@ func (uc *UserController) Login() echo.HandlerFunc {
 		response.ID = result.ID
 		response.Name = result.Name
 		response.Phone = result.Phone
-		response.Password = result.Password
 		response.Role = result.Role
 		response.Token = strToken
 
 		return c.JSON(http.StatusOK, map[string]any{
 			"message": "Success Login Data",
+			"data":    response,
+		})
+	}
+}
+
+// Register implements user.Handler.
+func (uc *UserController) Register() echo.HandlerFunc {
+	return func(c echo.Context) error {
+		var input = new(RegisterRequest)
+		if err := c.Bind(input); err != nil {
+			return c.JSON(http.StatusBadRequest, map[string]any{
+				"message": "input tidak sesuai",
+			})
+		}
+		var inputProses = new(user.User)
+		inputProses.Phone = input.Phone
+		inputProses.Name = input.Name
+		inputProses.Password = input.Password
+
+		result, err := uc.srv.Register(*inputProses)
+		if err != nil {
+			c.Logger().Error("terjadi kesalahan", err.Error())
+			if strings.Contains(err.Error(), "duplicate") {
+				return c.JSON(http.StatusBadRequest, map[string]any{
+					"message": "dobel input nama",
+				})
+			}
+			return c.JSON(http.StatusBadRequest, map[string]any{
+				"message": "email telah terdaftar",
+			})
+		}
+		var response = new(RegisterResponse)
+		response.ID = result.ID
+		response.Phone = result.Phone
+		response.Name = result.Name
+
+		return c.JSON(http.StatusCreated, map[string]any{
+			"message": "Success Register Data",
 			"data":    response,
 		})
 	}

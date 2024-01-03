@@ -16,12 +16,15 @@ type User struct {
 
 type Handler interface {
 	Login() echo.HandlerFunc
+	Register() echo.HandlerFunc
 }
 
 type Service interface {
 	Login(phone string, password string) (User, error)
+	Register(newUser User) (User, error)
 }
 
 type Repository interface {
 	Login(phone string) (User, error)
+	Register(newUser User) (User, error)
 }
