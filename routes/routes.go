@@ -21,4 +21,6 @@ func RouteUser(e *echo.Echo, uc user.Handler) {
 	e.POST("/login", uc.Login())
 	e.POST("/register", uc.Register())
 	e.PATCH("/user/password/:id", uc.ResetPassword(), echojwt.JWT([]byte("$!1gnK3yyy!!!")))
+	e.PATCH("/user/update/:id", uc.UpdateUser(), echojwt.JWT([]byte("$!1gnK3yyy!!!")))
+
 }

@@ -117,3 +117,28 @@ func (us *UserService) ResetPassword(token *golangjwt.Token, input user.User) (u
 	}
 	return respons, nil
 }
+
+// UpdateUser implements user.Service.
+func (us *UserService) UpdateUser(token *golangjwt.Token, input user.User) (user.User, error) {
+	userID, rolesUser, err := jwt.ExtractToken(token)
+	if err != nil {
+		return user.User{}, errors.New("harap login")
+	}
+
+	if userID != input.ID && rolesUser != "admin" {
+		return user.User{}, errors.New("id tidak cocok")
+	}
+	exitingUser, err := us.repo.GetUserByID(userID)
+	if err != nil {
+		return user.User{}, errors.New("failed to retrieve the user for deletion")
+	}
+	if exitingUser.ID != userID {
+		return user.User{}, errors.New("you don't have permission to delete this user")
+	}
+	respons, err := us.repo.UpdateUser(input)
+	if err != nil {
+
+		return user.User{}, errors.New("kesalahan pada database")
+	}
+	return respons, nil
+}

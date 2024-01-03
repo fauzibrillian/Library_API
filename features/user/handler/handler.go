@@ -1,23 +1,33 @@
 package handler
 
 import (
+	"context"
+	"errors"
 	"library_api/features/user"
+	"library_api/helper/cld"
 	"library_api/helper/jwt"
 	"net/http"
 	"strconv"
 	"strings"
 
+	"github.com/cloudinary/cloudinary-go/v2"
 	gojwt "github.com/golang-jwt/jwt/v5"
 	echo "github.com/labstack/echo/v4"
 )
 
 type UserController struct {
-	srv user.Service
+	srv    user.Service
+	cl     *cloudinary.Cloudinary
+	ct     context.Context
+	folder string
 }
 
-func New(s user.Service) user.Handler {
+func New(s user.Service, cld *cloudinary.Cloudinary, ctx context.Context, uploadparam string) user.Handler {
 	return &UserController{
-		srv: s,
+		srv:    s,
+		cl:     cld,
+		ct:     ctx,
+		folder: uploadparam,
 	}
 }
 
@@ -169,6 +179,162 @@ func (uc *UserController) ResetPassword() echo.HandlerFunc {
 
 		return c.JSON(http.StatusCreated, map[string]any{
 			"message": "Success Reset Password Data User",
+			"data":    response,
+		})
+	}
+}
+
+// UpdateUser implements user.Handler.
+func (uc *UserController) UpdateUser() echo.HandlerFunc {
+	return func(c echo.Context) error {
+		var input = new(PutUserRequest)
+		userID, err := strconv.ParseUint(c.Param("id"), 10, 64)
+		if err != nil {
+			return c.JSON(http.StatusBadRequest, map[string]interface{}{
+				"message": "ID user tidak valid",
+				"data":    nil,
+			})
+		}
+		if userID == 0 {
+			return c.JSON(http.StatusUnauthorized, map[string]interface{}{
+				"message": "Harap Login dulu",
+				"data":    nil,
+			})
+		}
+		if err := c.Bind(input); err != nil {
+			return c.JSON(http.StatusBadRequest, map[string]any{
+				"message": "input yang diberikan tidak sesuai",
+				"data":    nil,
+			})
+		}
+
+		formHeader, err := c.FormFile("avatar")
+		if err != nil {
+			if errors.Is(err, http.ErrMissingFile) {
+				userID, err := strconv.ParseUint(c.Param("id"), 10, 64)
+				if err != nil {
+					return c.JSON(http.StatusBadRequest, map[string]interface{}{
+						"message": "ID user tidak valid",
+					})
+				}
+				var inputProcess = new(user.User)
+				inputProcess.Avatar = ""
+				inputProcess.ID = uint(userID)
+				inputProcess.Phone = input.Phone
+				inputProcess.Name = input.Name
+
+				result, err := uc.srv.UpdateUser(c.Get("user").(*gojwt.Token), *inputProcess)
+
+				if err != nil {
+					c.Logger().Error("ERROR Register, explain:", err.Error())
+					var statusCode = http.StatusInternalServerError
+					var message = "terjadi permasalahan ketika memproses data"
+
+					if strings.Contains(err.Error(), "kesalahan pada database") {
+						statusCode = http.StatusNotFound
+						message = "User Tidak Terdaftar"
+					}
+					if strings.Contains(err.Error(), "id tidak cocok") {
+						statusCode = http.StatusUnauthorized
+						message = "Tidak Mempunyai Akses"
+					}
+					if strings.Contains(err.Error(), "terdaftar") {
+						statusCode = http.StatusConflict
+						message = "data yang diinputkan sudah terdaftar ada sistem"
+					}
+					if strings.Contains(err.Error(), "yang lama") {
+						statusCode = http.StatusBadRequest
+						message = "harap masukkan password yang lama jika ingin mengganti password"
+					}
+
+					return c.JSON(statusCode, map[string]any{
+						"message": message,
+					})
+				}
+
+				var response = new(PutUserResponse)
+				response.ID = result.ID
+				response.Name = result.Name
+				response.Phone = result.Phone
+				response.Avatar = result.Avatar
+
+				return c.JSON(http.StatusCreated, map[string]any{
+					"message": "Success Updated Data User",
+					"data":    response,
+				})
+			}
+			return c.JSON(
+				http.StatusBadRequest, map[string]any{
+					"message": "formheader error",
+					"data":    nil,
+				})
+
+		}
+
+		formFile, err := formHeader.Open()
+		if err != nil {
+			return c.JSON(
+				http.StatusBadRequest, map[string]any{
+					"message": "formfile error",
+					"data":    nil,
+				})
+		}
+		defer formFile.Close()
+
+		link, err := cld.UploadImage(uc.cl, uc.ct, formFile, uc.folder)
+		if err != nil {
+			if strings.Contains(err.Error(), "not found") {
+				return c.JSON(http.StatusBadRequest, map[string]any{
+					"message": "harap pilih gambar",
+					"data":    nil,
+				})
+			} else {
+				return c.JSON(http.StatusInternalServerError, map[string]any{
+					"message": "kesalahan pada server",
+					"data":    nil,
+				})
+			}
+		}
+
+		var inputProcess = new(user.User)
+		inputProcess.Avatar = link
+		inputProcess.ID = uint(userID)
+		inputProcess.Phone = input.Phone
+		inputProcess.Name = input.Name
+
+		result, err := uc.srv.UpdateUser(c.Get("user").(*gojwt.Token), *inputProcess)
+
+		if err != nil {
+			c.Logger().Error("ERROR Register, explain:", err.Error())
+			var statusCode = http.StatusInternalServerError
+			var message = "terjadi permasalahan ketika memproses data"
+
+			if strings.Contains(err.Error(), "id tidak cocok") {
+				statusCode = http.StatusUnauthorized
+				message = "Tidak Mempunyai Akses"
+			}
+			if strings.Contains(err.Error(), "terdaftar") {
+				statusCode = http.StatusBadRequest
+				message = "data yang diinputkan sudah terdaftar ada sistem"
+			}
+			if strings.Contains(err.Error(), "yang lama") {
+				statusCode = http.StatusBadRequest
+				message = "harap masukkan password yang lama jika ingin mengganti password"
+			}
+
+			return c.JSON(statusCode, map[string]any{
+				"message": message,
+			})
+		}
+
+		var response = new(PutUserResponse)
+		response.ID = result.ID
+		response.Name = result.Name
+		response.Phone = result.Phone
+		response.Avatar = result.Avatar
+
+		return c.JSON(http.StatusCreated, map[string]any{
+			"message": "Success Updated Data User",
 			"data":    response,
 		})
 	}

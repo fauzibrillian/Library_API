@@ -113,3 +113,40 @@ func (uq *UserQuery) ResetPassword(input user.User) (user.User, error) {
 
 	return result, nil
 }
+
+// UpdateUser implements user.Repository.
+func (uq *UserQuery) UpdateUser(input user.User) (user.User, error) {
+	var proses UserModel
+	if err := uq.db.First(&proses, input.ID).Error; err != nil {
+		return user.User{}, err
+	}
+
+	if proses.ID == 0 {
+		err := errors.New("user tidak ditemukan")
+		return user.User{}, err
+	}
+
+	if input.Name != "" {
+		proses.Name = input.Name
+	}
+	if input.Phone != "" {
+		proses.Phone = input.Phone
+	}
+
+	if input.Avatar != "" {
+		proses.Avatar = input.Avatar
+	}
+
+	if err := uq.db.Save(&proses).Error; err != nil {
+
+		return user.User{}, err
+	}
+	result := user.User{
+		ID:     proses.ID,
+		Name:   proses.Name,
+		Phone:  proses.Phone,
+		Avatar: proses.Avatar,
+	}
+
+	return result, nil
+}
