@@ -133,7 +133,7 @@ func (us *UserService) UpdateUser(token *golangjwt.Token, input user.User) (user
 		return user.User{}, errors.New("failed to retrieve the user for deletion")
 	}
 	if exitingUser.ID != userID {
-		return user.User{}, errors.New("you don't have permission to delete this user")
+		return user.User{}, errors.New("you don't have permission to update this user")
 	}
 	respons, err := us.repo.UpdateUser(input)
 	if err != nil {
