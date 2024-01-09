@@ -27,6 +27,19 @@ func New(db *gorm.DB) book.Repository {
 }
 
 // InsertBook implements book.Repository.
-func (*BookQuery) InsertBook(userID uint, newBook book.Book) (book.Book, error) {
-	panic("unimplemented")
+func (bq *BookQuery) InsertBook(userID uint, newBook book.Book) (book.Book, error) {
+	var inputDB = new(BookModel)
+	inputDB.Tittle = newBook.Tittle
+	inputDB.Publisher = newBook.Publisher
+	inputDB.Author = newBook.Author
+	inputDB.Picture = newBook.Picture
+	inputDB.Category = newBook.Category
+	inputDB.Stock = int(newBook.Stock)
+
+	if err := bq.db.Create(&inputDB).Error; err != nil {
+		return book.Book{}, err
+	}
+	newBook.ID = inputDB.ID
+
+	return newBook, nil
 }
