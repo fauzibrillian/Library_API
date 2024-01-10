@@ -1,6 +1,7 @@
 package routes
 
 import (
+	"library_api/config"
 	"library_api/features/user"
 
 	echojwt "github.com/labstack/echo-jwt/v4"
@@ -20,7 +21,7 @@ func InitRoute(e *echo.Echo, uc user.Handler) {
 func RouteUser(e *echo.Echo, uc user.Handler) {
 	e.POST("/login", uc.Login())
 	e.POST("/register", uc.Register())
-	e.PATCH("/user/password/:id", uc.ResetPassword(), echojwt.JWT([]byte("$!1gnK3yyy!!!")))
-	e.PATCH("/user/:id", uc.UpdateUser(), echojwt.JWT([]byte("$!1gnK3yyy!!!")))
-	e.DELETE("/user/:id", uc.Delete(), echojwt.JWT([]byte("$!1gnK3yyy!!!")))
+	e.PATCH("/user/password/:id", uc.ResetPassword(), echojwt.JWT([]byte(config.InitConfig().JWT)))
+	e.PATCH("/user/:id", uc.UpdateUser(), echojwt.JWT([]byte(config.InitConfig().JWT)))
+	e.DELETE("/user/:id", uc.Delete(), echojwt.JWT([]byte(config.InitConfig().JWT)))
 }
