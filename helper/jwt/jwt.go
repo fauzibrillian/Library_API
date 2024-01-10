@@ -2,6 +2,7 @@ package jwt
 
 import (
 	"errors"
+	"library_api/config"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
@@ -19,7 +20,7 @@ func GenerateJWT(idUser uint, rolesUser string) (string, error) {
 	claim["iat"] = time.Now().UnixMilli()
 	claim["exp"] = time.Now().Add(time.Minute * 30).UnixMilli()
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claim)
-	strToken, err := token.SignedString([]byte("$!1gnK3yyy!!!"))
+	strToken, err := token.SignedString([]byte(config.InitConfig().JWT))
 	if err != nil {
 		return "", err
 	}
