@@ -35,3 +35,24 @@ func (bs *BookServices) AddBook(token *golangjwt.Token, newBook book.Book) (book
 
 	return result, err
 }
+
+// UpdateBook implements book.Service.
+func (bs *BookServices) UpdateBook(token *golangjwt.Token, bookID uint, input book.Book) (book.Book, error) {
+	userId, rolesUser, err := jwt.ExtractToken(token)
+	if err != nil {
+		return book.Book{}, errors.New("token error")
+	}
+	if rolesUser == "" {
+		return book.Book{}, errors.New("role cannot empty")
+	}
+	if rolesUser != "admin" {
+		return book.Book{}, errors.New("unauthorized access: admin role required")
+	}
+
+	result, err := bs.repo.UpdateBook(userId, bookID, input)
+	if err != nil {
+		return book.Book{}, errors.New("failed to update the product")
+	}
+
+	return result, nil
+}
