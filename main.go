@@ -31,7 +31,7 @@ func main() {
 		e.Logger.Fatal("tidak bisa start bro", err.Error())
 	}
 
-	db.AutoMigrate(&ur.UserModel{}, &br.BookModel{})
+	db.AutoMigrate(&ur.UserModel{}, &br.BookModel{}, &br.BookDetail{}, &br.RackBook{})
 	ekrip := ek.New()
 	userRepo := ur.New(db)
 	userService := us.New(userRepo, ekrip)

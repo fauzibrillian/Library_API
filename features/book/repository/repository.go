@@ -3,18 +3,35 @@ package repository
 import (
 	"errors"
 	"library_api/features/book"
+	"time"
 
 	"gorm.io/gorm"
 )
 
 type BookModel struct {
 	gorm.Model
-	Tittle    string
-	Publisher string
-	Author    string
-	Picture   string
-	Category  string
-	Stock     int
+	Tittle      string
+	Publisher   string
+	Author      string
+	Picture     string
+	Category    string
+	Stock       uint
+	BookDetails []BookDetail `gorm:"many2many:book_detailbook;"`
+}
+
+type BookDetail struct {
+	CodeDetail  uint         `gorm:"primaryKey" json:"code_detail"`
+	BookID      uint         `json:"id_book"`
+	RackID      uint         `json:"id_rack"`
+	RackDetails []BookDetail `gorm:"many2many:rack_detailbook;"`
+	CreatedAt   time.Time
+	UpdatedAt   time.Time
+	DeletedAt   gorm.DeletedAt `gorm:"index"`
+}
+
+type RackBook struct {
+	gorm.Model
+	Name string
 }
 
 type BookQuery struct {
@@ -35,7 +52,7 @@ func (bq *BookQuery) InsertBook(userID uint, newBook book.Book) (book.Book, erro
 	inputDB.Author = newBook.Author
 	inputDB.Picture = newBook.Picture
 	inputDB.Category = newBook.Category
-	inputDB.Stock = int(newBook.Stock)
+	inputDB.Stock = newBook.Stock
 
 	if err := bq.db.Create(&inputDB).Error; err != nil {
 		return book.Book{}, err
@@ -73,7 +90,7 @@ func (bq *BookQuery) UpdateBook(userID uint, bookID uint, input book.Book) (book
 		proses.Category = input.Category
 	}
 	if input.Stock != 0 {
-		proses.Stock = int(input.Stock)
+		proses.Stock = input.Stock
 	}
 
 	if input.Picture != "" {

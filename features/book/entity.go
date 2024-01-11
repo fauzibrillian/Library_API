@@ -6,13 +6,20 @@ import (
 )
 
 type Book struct {
-	ID        uint   `json:"id"`
-	Tittle    string `json:"tittle"`
-	Publisher string `json:"publisher"`
-	Author    string `json:"author"`
-	Picture   string `json:"picture"`
-	Category  string `json:"category"`
-	Stock     uint   `json:"stock"`
+	ID          uint         `json:"id"`
+	Tittle      string       `json:"tittle"`
+	Publisher   string       `json:"publisher"`
+	Author      string       `json:"author"`
+	Picture     string       `json:"picture"`
+	Category    string       `json:"category"`
+	Stock       uint         `json:"stock"`
+	BookDetails []BookDetail `json:"book_detail" gorm:"many2many:book_detailbook;"`
+}
+
+type BookDetail struct {
+	CodeDetail uint `json:"code_detail"`
+	BookID     uint `json:"id_book"`
+	RackID     uint `json:"id_rack"`
 }
 
 type Handler interface {
