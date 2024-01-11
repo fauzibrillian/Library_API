@@ -17,12 +17,15 @@ type Book struct {
 
 type Handler interface {
 	AddBook() echo.HandlerFunc
+	UpdateBook() echo.HandlerFunc
 }
 
 type Service interface {
 	AddBook(token *jwt.Token, newBook Book) (Book, error)
+	UpdateBook(token *jwt.Token, bookID uint, input Book) (Book, error)
 }
 
 type Repository interface {
 	InsertBook(userID uint, newBook Book) (Book, error)
+	UpdateBook(userID uint, bookID uint, input Book) (Book, error)
 }

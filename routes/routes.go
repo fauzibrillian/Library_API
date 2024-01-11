@@ -23,11 +23,12 @@ func InitRoute(e *echo.Echo, uc user.Handler, bh book.Handler) {
 func RouteUser(e *echo.Echo, uc user.Handler) {
 	e.POST("/login", uc.Login())
 	e.POST("/register", uc.Register())
-	e.PATCH("/user/password/:id", uc.ResetPassword(), echojwt.JWT([]byte(config.InitConfig().JWT)))
+	e.PATCH("/resetpassword/:id", uc.ResetPassword(), echojwt.JWT([]byte(config.InitConfig().JWT)))
 	e.PATCH("/user/:id", uc.UpdateUser(), echojwt.JWT([]byte(config.InitConfig().JWT)))
 	e.DELETE("/user/:id", uc.Delete(), echojwt.JWT([]byte(config.InitConfig().JWT)))
 }
 
 func RouteBook(e *echo.Echo, bh book.Handler) {
 	e.POST("/addbook", bh.AddBook(), echojwt.JWT([]byte(config.InitConfig().JWT)))
+	e.PATCH("/updatebook/:id", bh.UpdateBook(), echojwt.JWT([]byte(config.InitConfig().JWT)))
 }
