@@ -95,3 +95,14 @@ func (bq *BookQuery) UpdateBook(userID uint, bookID uint, input book.Book) (book
 	}
 	return result, nil
 }
+
+// DelBook implements book.Repository.
+func (bq *BookQuery) DelBook(userID uint, bookID uint) error {
+	var prod = new(BookModel)
+	if err := bq.db.Where("id", bookID).Find(&prod).Error; err != nil {
+		return err
+	}
+
+	bq.db.Where("id", bookID).Delete(&prod)
+	return nil
+}
