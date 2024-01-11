@@ -122,7 +122,7 @@ func (bh *BookHandler) AddBook() echo.HandlerFunc {
 
 		result, err := bh.s.AddBook(c.Get("user").(*golangjwt.Token), *inputProcess)
 		if err != nil {
-			c.Logger().Error("ERROR Register, explain:", err.Error())
+			c.Logger().Error("ERROR Register Book, explain:", err.Error())
 
 			if strings.Contains(err.Error(), "terdaftar") {
 				return c.JSON(http.StatusBadRequest, map[string]any{
@@ -275,16 +275,16 @@ func (bh *BookHandler) UpdateBook() echo.HandlerFunc {
 		result, err := bh.s.UpdateBook(c.Get("user").(*golangjwt.Token), uint(bookID), updatedBook)
 
 		if err != nil {
-			c.Logger().Error("ERROR Updating Product, explain:", err.Error())
+			c.Logger().Error("ERROR Updating Book, explain:", err.Error())
 			var statusCode = http.StatusInternalServerError
 			var message = "terjadi permasalahan ketika memproses data"
 
 			if strings.Contains(err.Error(), "admin role required") {
 				statusCode = http.StatusUnauthorized
 				message = "Anda tidak memiliki izin untuk mengupdate produk"
-			} else if strings.Contains(err.Error(), "product tidak ditemukan") {
+			} else if strings.Contains(err.Error(), "Book tidak ditemukan") {
 				statusCode = http.StatusNotFound
-				message = "Produk tidak ditemukan"
+				message = "Book tidak ditemukan"
 			}
 
 			return c.JSON(statusCode, map[string]any{
@@ -303,6 +303,42 @@ func (bh *BookHandler) UpdateBook() echo.HandlerFunc {
 		return c.JSON(http.StatusCreated, map[string]any{
 			"message": "Success Updated Data",
 			"data":    response,
+		})
+	}
+}
+
+// DeleteBook implements book.Handler.
+func (bh *BookHandler) DeleteBook() echo.HandlerFunc {
+	return func(c echo.Context) error {
+		bookID, err := strconv.ParseUint(c.Param("id"), 10, 64)
+		if err != nil {
+			return c.JSON(http.StatusBadRequest, map[string]interface{}{
+				"message": "ID book tidak valid",
+				"data":    nil,
+			})
+		}
+
+		errDel := bh.s.DelBook(c.Get("user").(*golangjwt.Token), uint(bookID))
+
+		if errDel != nil {
+			c.Logger().Error("ERROR Deleting Book, explain:", errDel.Error())
+			var statusCode = http.StatusInternalServerError
+			var message = "terjadi permasalahan ketika memproses data"
+
+			if strings.Contains(errDel.Error(), "admin role required") {
+				statusCode = http.StatusUnauthorized
+				message = "Anda tidak memiliki izin untuk menghapus book"
+			} else if strings.Contains(errDel.Error(), "book tidak ditemukan") {
+				statusCode = http.StatusNotFound
+				message = "Book tidak ditemukan"
+			}
+
+			return c.JSON(statusCode, map[string]interface{}{
+				"message": message,
+			})
+		}
+		return c.JSON(http.StatusOK, map[string]any{
+			"message": "Delete Book Success",
 		})
 	}
 }

@@ -30,5 +30,7 @@ func RouteUser(e *echo.Echo, uc user.Handler) {
 
 func RouteBook(e *echo.Echo, bh book.Handler) {
 	e.POST("/addbook", bh.AddBook(), echojwt.JWT([]byte(config.InitConfig().JWT)))
-	e.PATCH("/updatebook/:id", bh.UpdateBook(), echojwt.JWT([]byte(config.InitConfig().JWT)))
+	e.PATCH("/book/:id", bh.UpdateBook(), echojwt.JWT([]byte(config.InitConfig().JWT)))
+	e.DELETE("/book/:id", bh.DeleteBook(), echojwt.JWT([]byte(config.InitConfig().JWT)))
+
 }

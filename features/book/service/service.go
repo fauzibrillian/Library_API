@@ -56,3 +56,16 @@ func (bs *BookServices) UpdateBook(token *golangjwt.Token, bookID uint, input bo
 
 	return result, nil
 }
+
+// DelBook implements book.Service.
+func (bs *BookServices) DelBook(token *golangjwt.Token, bookID uint) error {
+	userId, rolesUser, err := jwt.ExtractToken(token)
+	if err != nil {
+		return errors.New("token error")
+	}
+	if rolesUser != "admin" {
+		return errors.New("unauthorized access: admin role required")
+	}
+	err = bs.repo.DelBook(userId, bookID)
+	return err
+}
