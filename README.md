@@ -24,3 +24,6 @@ MVP
     - terdapat pengingat sms ke nomer user
     - terdapat kelipatan 5000 per hari jika telat mengembalikan buku
     - pembayaran bisa pakek midtrans
+
+
+- link ERD : https://drive.google.com/file/d/1jYwDdKvuOOrMqow5Ml7rp-nEp59C9pY0/view
