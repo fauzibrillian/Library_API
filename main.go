@@ -7,6 +7,10 @@ import (
 	ur "library_api/features/user/repository"
 	us "library_api/features/user/service"
 
+	rh "library_api/features/rack/handler"
+	rr "library_api/features/rack/repository"
+	rs "library_api/features/rack/service"
+
 	bh "library_api/features/book/handler"
 	br "library_api/features/book/repository"
 	bs "library_api/features/book/service"
@@ -31,17 +35,21 @@ func main() {
 		e.Logger.Fatal("tidak bisa start bro", err.Error())
 	}
 
-	db.AutoMigrate(&ur.UserModel{}, &br.BookModel{})
+	db.AutoMigrate(&ur.UserModel{}, &br.BookModel{}, &br.BookDetail{}, &rr.RackModel{})
 	ekrip := ek.New()
 	userRepo := ur.New(db)
 	userService := us.New(userRepo, ekrip)
 	userHandler := uh.New(userService, cld, ctx, param)
 
+	rackRepo := rr.New(db)
+	rackService := rs.New(rackRepo)
+	rackHandler := rh.New(rackService)
+
 	bookRepo := br.New(db)
 	bookService := bs.New(bookRepo)
 	bookHandler := bh.New(bookService, cld, ctx, param)
 
-	routes.InitRoute(e, userHandler, bookHandler)
+	routes.InitRoute(e, userHandler, bookHandler, rackHandler)
 
 	e.Logger.Fatal(e.Start(":8000"))
 

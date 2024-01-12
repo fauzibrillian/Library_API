@@ -22,7 +22,7 @@ func New(r book.Repository) book.Service {
 func (bs *BookServices) AddBook(token *golangjwt.Token, newBook book.Book) (book.Book, error) {
 	userId, rolesUser, err := jwt.ExtractToken(token)
 	if err != nil {
-		return book.Book{}, errors.New("Token Error")
+		return book.Book{}, errors.New("token Error")
 	}
 	if rolesUser != "admin" {
 		return book.Book{}, errors.New("unauthorized access: admin role required")
@@ -30,7 +30,7 @@ func (bs *BookServices) AddBook(token *golangjwt.Token, newBook book.Book) (book
 
 	result, err := bs.repo.InsertBook(userId, newBook)
 	if err != nil {
-		return book.Book{}, errors.New("Inputan tidak boleh kosong")
+		return book.Book{}, errors.New("inputan tidak boleh kosong")
 	}
 
 	return result, err
@@ -68,4 +68,22 @@ func (bs *BookServices) DelBook(token *golangjwt.Token, bookID uint) error {
 	}
 	err = bs.repo.DelBook(userId, bookID)
 	return err
+}
+
+// AddDetail implements book.Service.
+func (bs *BookServices) AddDetail(token *golangjwt.Token, newDetail book.Book, newRack book.Rack) (book.BookDetail, error) {
+	userId, rolesUser, err := jwt.ExtractToken(token)
+	if err != nil {
+		return book.BookDetail{}, errors.New("token Error")
+	}
+	if rolesUser != "admin" {
+		return book.BookDetail{}, errors.New("unauthorized access: admin role required")
+	}
+
+	result, err := bs.repo.InsertDetail(userId, newDetail, newRack)
+	if err != nil {
+		return book.BookDetail{}, errors.New("inputan tidak boleh kosong")
+	}
+
+	return result, err
 }
