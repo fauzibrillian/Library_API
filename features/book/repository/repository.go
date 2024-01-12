@@ -3,7 +3,6 @@ package repository
 import (
 	"errors"
 	"library_api/features/book"
-	"time"
 
 	"gorm.io/gorm"
 )
@@ -16,22 +15,13 @@ type BookModel struct {
 	Picture     string
 	Category    string
 	Stock       uint
-	BookDetails []BookDetail `gorm:"many2many:book_detailbook;"`
+	BookDetails []BookDetail `gorm:"foreignKey:BookID;"`
 }
 
 type BookDetail struct {
-	CodeDetail  uint         `gorm:"primaryKey" json:"code_detail"`
-	BookID      uint         `json:"id_book"`
-	RackID      uint         `json:"id_rack"`
-	RackDetails []BookDetail `gorm:"many2many:rack_detailbook;"`
-	CreatedAt   time.Time
-	UpdatedAt   time.Time
-	DeletedAt   gorm.DeletedAt `gorm:"index"`
-}
-
-type RackBook struct {
 	gorm.Model
-	Name string
+	BookID uint `json:"id_book"`
+	RackID uint `json:"id_rack"`
 }
 
 type BookQuery struct {
@@ -42,6 +32,20 @@ func New(db *gorm.DB) book.Repository {
 	return &BookQuery{
 		db: db,
 	}
+}
+
+// InsertDetail implements book.Repository.
+func (bq *BookQuery) InsertDetail(userID uint, newDetail book.Book, newRack book.Rack) (book.BookDetail, error) {
+	var detail book.BookDetail
+	detail.BookID = newDetail.ID
+	detail.RackID = newRack.ID
+
+	qry := bq.db.Create(&detail)
+	if err := qry.Error; err != nil {
+		return book.BookDetail{}, err
+	}
+
+	return detail, nil
 }
 
 // InsertBook implements book.Repository.

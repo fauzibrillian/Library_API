@@ -342,3 +342,40 @@ func (bh *BookHandler) DeleteBook() echo.HandlerFunc {
 		})
 	}
 }
+
+// AddDetail implements book.Handler.
+func (bh *BookHandler) AddDetail() echo.HandlerFunc {
+	return func(c echo.Context) error {
+		var input = new(BookDetailRequest)
+		if err := c.Bind(input); err != nil {
+			return c.JSON(http.StatusBadRequest, map[string]any{
+				"message": "input tidak sesuai",
+			})
+		}
+		var inputproses = new(book.Book)
+		inputproses.ID = input.IdBook
+
+		var rackproses = new(book.Rack)
+		rackproses.ID = input.IdRack
+		result, err := bh.s.AddDetail(c.Get("user").(*golangjwt.Token), *inputproses, *rackproses)
+		if err != nil {
+			c.Logger().Error("terjadi kesalahan", err.Error())
+			if strings.Contains(err.Error(), "duplicate") {
+				return c.JSON(http.StatusBadRequest, map[string]any{
+					"message": "dobel input nama",
+				})
+			}
+			return c.JSON(http.StatusBadRequest, map[string]any{
+				"message": "detail telah terdaftar",
+			})
+		}
+		var response = new(BookDetailResponse)
+		response.IdRack = result.RackID
+		response.IdBook = result.BookID
+
+		return c.JSON(http.StatusCreated, map[string]any{
+			"message": "Success Created Detail Book Data",
+			"data":    response,
+		})
+	}
+}

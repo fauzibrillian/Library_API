@@ -17,25 +17,33 @@ type Book struct {
 }
 
 type BookDetail struct {
-	CodeDetail uint `json:"code_detail"`
-	BookID     uint `json:"id_book"`
-	RackID     uint `json:"id_rack"`
+	ID     uint `json:"id"`
+	BookID uint `json:"id_book"`
+	RackID uint `json:"id_rack"`
+}
+
+type Rack struct {
+	ID   uint   `json:"id_rack"`
+	Name string `json:"name"`
 }
 
 type Handler interface {
 	AddBook() echo.HandlerFunc
+	AddDetail() echo.HandlerFunc
 	UpdateBook() echo.HandlerFunc
 	DeleteBook() echo.HandlerFunc
 }
 
 type Service interface {
 	AddBook(token *jwt.Token, newBook Book) (Book, error)
+	AddDetail(token *jwt.Token, newDetail Book, newRack Rack) (BookDetail, error)
 	UpdateBook(token *jwt.Token, bookID uint, input Book) (Book, error)
 	DelBook(token *jwt.Token, bookID uint) error
 }
 
 type Repository interface {
 	InsertBook(userID uint, newBook Book) (Book, error)
+	InsertDetail(userID uint, newDetail Book, newRack Rack) (BookDetail, error)
 	UpdateBook(userID uint, bookID uint, input Book) (Book, error)
 	DelBook(userID uint, bookID uint) error
 }

@@ -3,6 +3,7 @@ package routes
 import (
 	"library_api/config"
 	"library_api/features/book"
+	"library_api/features/rack"
 	"library_api/features/user"
 
 	echojwt "github.com/labstack/echo-jwt/v4"
@@ -10,7 +11,7 @@ import (
 	"github.com/labstack/echo/v4/middleware"
 )
 
-func InitRoute(e *echo.Echo, uc user.Handler, bh book.Handler) {
+func InitRoute(e *echo.Echo, uc user.Handler, bh book.Handler, rh rack.Handler) {
 	e.Pre(middleware.RemoveTrailingSlash())
 
 	e.Use(middleware.CORS())
@@ -18,6 +19,7 @@ func InitRoute(e *echo.Echo, uc user.Handler, bh book.Handler) {
 
 	RouteUser(e, uc)
 	RouteBook(e, bh)
+	RouteRack(e, rh)
 }
 
 func RouteUser(e *echo.Echo, uc user.Handler) {
@@ -29,8 +31,12 @@ func RouteUser(e *echo.Echo, uc user.Handler) {
 }
 
 func RouteBook(e *echo.Echo, bh book.Handler) {
-	e.POST("/addbook", bh.AddBook(), echojwt.JWT([]byte(config.InitConfig().JWT)))
+	e.POST("/book", bh.AddBook(), echojwt.JWT([]byte(config.InitConfig().JWT)))
+	e.POST("/book_detail", bh.AddDetail(), echojwt.JWT([]byte(config.InitConfig().JWT)))
 	e.PATCH("/book/:id", bh.UpdateBook(), echojwt.JWT([]byte(config.InitConfig().JWT)))
 	e.DELETE("/book/:id", bh.DeleteBook(), echojwt.JWT([]byte(config.InitConfig().JWT)))
+}
 
+func RouteRack(e *echo.Echo, rh rack.Handler) {
+	e.POST("/rack", rh.AddRack(), echojwt.JWT([]byte(config.InitConfig().JWT)))
 }

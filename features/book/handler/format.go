@@ -36,3 +36,13 @@ type BookPutResponse struct {
 	Picture   string `json:"picture" form:"picture"`
 	Category  string `json:"category" form:"category"`
 }
+
+type BookDetailRequest struct {
+	IdBook uint `json:"id_book" form:"id_book"`
+	IdRack uint `json:"id_rack" form:"id_rack"`
+}
+
+type BookDetailResponse struct {
+	IdBook     uint `json:"id_book" form:"id_book"`
+	IdRack     uint `json:"id_rack" form:"id_rack"`
+}
