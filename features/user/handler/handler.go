@@ -151,7 +151,7 @@ func (uc *UserController) ResetPassword() echo.HandlerFunc {
 		result, err := uc.srv.ResetPassword(c.Get("user").(*gojwt.Token), *inputProcess)
 
 		if err != nil {
-			c.Logger().Error("ERROR Register, explain:", err.Error())
+			c.Logger().Error("ERROR Reset Password, explain:", err.Error())
 			var statusCode = http.StatusInternalServerError
 			var message = "terjadi permasalahan ketika memproses data"
 
@@ -226,7 +226,7 @@ func (uc *UserController) UpdateUser() echo.HandlerFunc {
 				result, err := uc.srv.UpdateUser(c.Get("user").(*gojwt.Token), *inputProcess)
 
 				if err != nil {
-					c.Logger().Error("ERROR Register, explain:", err.Error())
+					c.Logger().Error("ERROR Update User, explain:", err.Error())
 					var statusCode = http.StatusInternalServerError
 					var message = "terjadi permasalahan ketika memproses data"
 
@@ -305,7 +305,7 @@ func (uc *UserController) UpdateUser() echo.HandlerFunc {
 		result, err := uc.srv.UpdateUser(c.Get("user").(*gojwt.Token), *inputProcess)
 
 		if err != nil {
-			c.Logger().Error("ERROR Register, explain:", err.Error())
+			c.Logger().Error("ERROR Update User, explain:", err.Error())
 			var statusCode = http.StatusInternalServerError
 			var message = "terjadi permasalahan ketika memproses data"
 
