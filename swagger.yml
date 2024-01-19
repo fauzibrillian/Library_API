@@ -510,6 +510,93 @@ paths:
           $ref: "#/components/responses/405"
         '500':
           $ref: "#/components/responses/500"
+    get:
+      tags:
+        - Books
+      summary: Get All Books
+      description: ''
+      operationId: getAllBooks
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: 
+            type: integer
+          example: 1
+      responses:
+        "201": 
+          description: get books product
+          content:
+            application/json:
+              schema: 
+                type: object
+                example:
+                  message: "get all books successful"
+                  pagination:
+                    limit: 2
+                    page: 1
+                    total_page: 2
+                  data:
+                  - book_id: 1
+                    tittle: 'Harry Potter'
+                    author: 'JH. Ronald'
+                    picture: 'https://res.cloudinary.com/dekr35x5t/image/upload/v1702476230/be_Hi_Spec/htegoywm9rjdiepbjnzx.png'
+                  - book_id: 2
+                    tittle: 'Laskar Pelangi'
+                    author: 'Toto Keidi'
+                    picture: 'https://res.cloudinary.com/dekr35x5t/image/upload/v1702476230/be_Hi_Spec/htegoywm9rjdiepbjnzx.png'
+        '400':
+          $ref: "#/components/responses/400"
+        '401':
+          $ref: "#/components/responses/401"
+        '405':
+          $ref: "#/components/responses/405"
+        '500':
+          $ref: "#/components/responses/500"
+  /books/{id}:
+    get:
+      tags:
+        - Books
+      summary: Get Books
+      description: ''
+      operationId: getBooksByID
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: 
+            type: integer
+          example: 1
+      responses:
+        "201": 
+          description: get books product
+          content:
+            application/json:
+              schema: 
+                type: object
+                example:
+                  message: "get books successful"
+                  data:
+                  book:
+                    - book_id: 1
+                      tittle: 'Harry Potter'
+                      author: 'JH. Ronald'
+                      picture: 'https://res.cloudinary.com/dekr35x5t/image/upload/v1702476230/be_Hi_Spec/htegoywm9rjdiepbjnzx.png'
+                      category: 'Fiction'
+                      durability: 75
+                  rack:
+                    - rack_id: 1
+        '400':
+          $ref: "#/components/responses/400"
+        '401':
+          $ref: "#/components/responses/401"
+        '405':
+          $ref: "#/components/responses/405"
+        '500':
+          $ref: "#/components/responses/500"
+
 
         
 components:
@@ -653,6 +740,11 @@ components:
                     type: integer
                     example: 6
   requestBodies:
+    updateBooks:
+      content:
+        application/json:
+          schema: 
+            $ref: "#/components/schemas/Book"
     updateUser:
       content:
         application/json:
