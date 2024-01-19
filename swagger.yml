@@ -293,7 +293,7 @@ paths:
     get:
       tags:
         - Racks
-      summary: Get racks
+      summary: Get All racks
       description: ''
       operationId: getAllRacks
       security:
@@ -449,6 +449,67 @@ paths:
           $ref: "#/components/responses/405"
         '500':
           $ref: "#/components/responses/500"
+  /books:
+    post:
+      tags:
+        - Books
+      summary: Books Book into library
+      description: ''
+      operationId: books
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: tittle
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: publisher
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: author
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: picture
+          in: query
+          required: true
+          schema:
+            type: string
+            format: binary
+        - name: category
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: durability
+          in: query
+          required: true
+          schema:
+            type: integer
+        - name: rack_id
+          in: query
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Book'
+        '400':
+          $ref: "#/components/responses/400"
+        '401':
+          $ref: "#/components/responses/401"
+        '405':
+          $ref: "#/components/responses/405"
+        '500':
+          $ref: "#/components/responses/500"
 
         
 components:
@@ -548,6 +609,49 @@ components:
                 type: string
                 format: binary
                 example: '18962387egWJADv'
+    Book:
+      type: object
+      properties:
+        message:
+          type: string
+          example: 'Add Book sucessfully'
+        data:
+          type: object
+          properties:
+              tittle:
+                type: string
+                example: 'Harry Potter'
+              publisher:
+                type: string
+                example: 'Gramedia Sukses'
+              author:
+                type: string
+                example: 'PJ. Arnold'
+              picture:
+                type: string
+                format: binary
+                example: 'www.cloudinary.com/iugwd8728iiuaw'
+              category:
+                type: string
+                example: 'Fiction'
+              durability:
+                type: integer
+                example: 75
+              rack_book:
+                type: object
+                properties:
+                  id_rack:
+                    type: integer
+                    example: 1
+                  name:
+                    type: string 
+                    example: 'R2'
+                  row:
+                    type: integer
+                    example: 4
+                  coloum:
+                    type: integer
+                    example: 6
   requestBodies:
     updateUser:
       content:
