@@ -5,13 +5,13 @@ info:
 servers:
   - url: https://api.server.test/v1
 tags:
-  - name: Book
+  - name: Books
     description: Everything about your Book
-  - name: Rack
+  - name: Racks
     description: Everything about your Rack Book
-  - name: User
+  - name: Users
     description: Operations about User
-  - name: Transaction
+  - name: Transactions
     description: Operations about Transaction
   - name: Auth
     description: Operations about Auth
@@ -42,7 +42,13 @@ paths:
               schema:
                 $ref: '#/components/schemas/Login'
         '400':
-          description: Invalid username/password supplied
+          $ref: "#/components/responses/400"
+        '401':
+          $ref: "#/components/responses/401"
+        '405':
+          $ref: "#/components/responses/405"
+        '500':
+          $ref: "#/components/responses/500"
   /register:
     post:
       tags:
@@ -67,116 +73,525 @@ paths:
           schema:
             type: string
       responses:
-        default:
+        '200':
           description: successful operation
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/User'
+                $ref: '#/components/schemas/Register'
         '400':
-          description: Invalid username/password supplied
-  /user/:id:
+          $ref: "#/components/responses/400"
+        '401':
+          $ref: "#/components/responses/401"
+        '405':
+          $ref: "#/components/responses/405"
+        '500':
+          $ref: "#/components/responses/500"
+  /users/{id}:
     patch:
       tags:
-        - User
+        - Users
       summary: Update user
       description: ''
       operationId: updateUser
       security:
         - bearerAuth: []
       parameters:
+        - in: path
+          name: user_id
+          required: true
+          schema: 
+            type: integer
+          example: 1
+      requestBody:
+        $ref: "#/components/requestBodies/updateUser"
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              example:
+                message: "success update users detail"
+                data:
+                  - user_id: 1
+                    name: "Jamal"
+                    phone: "08255"
+                    avatar: "https://res.cloudinary.com/dekr35x5t/image/upload/v1702476230/be_Hi_Spec/htegoywm9rjdiepbjnzx.png"
+        '400':
+          $ref: "#/components/responses/400"
+        '401':
+          $ref: "#/components/responses/401"
+        '405':
+          $ref: "#/components/responses/405"
+        '500':
+          $ref: "#/components/responses/500"
+    delete:
+      tags:
+        - Users
+      summary: Delete users
+      description: ''
+      operationId: deleteUsers
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: user_id
+          required: true
+          schema: 
+            type: integer
+          example: 1
+      responses:
+        "204":
+          description: "delete user successful"
+          content:
+            application/json:
+              example:
+                message: "success delete user"
+        '400':
+          $ref: "#/components/responses/400"
+        '401':
+          $ref: "#/components/responses/401"
+        '405':
+          $ref: "#/components/responses/405"
+        '500':
+          $ref: "#/components/responses/500"
+    get:
+      tags:
+        - Users
+      summary: Get users Detail
+      description: ''
+      operationId: getUsers
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: 
+            type: integer
+          example: 1
+      responses:
+        "204":
+          description: "Get users detail successful"
+          content:
+            application/json:
+              example:
+                message: "success get users detail"
+                data:
+                  - user_id: 1
+                    name: "Jamal"
+                    phone: "08255"
+                    avatar: "https://res.cloudinary.com/dekr35x5t/image/upload/v1702476230/be_Hi_Spec/htegoywm9rjdiepbjnzx.png"
+        '400':
+          $ref: "#/components/responses/400"
+        '401':
+          $ref: "#/components/responses/401"
+        '405':
+          $ref: "#/components/responses/405"
+        '500':
+          $ref: "#/components/responses/500"
+  /users:
+    get:
+      tags:
+        - Users
+      summary: Get users
+      description: ''
+      operationId: getAlluser
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: query
+          name: page 
+          required: false 
+          schema: 
+           type: integer
+          example: 1
+        - in: query
+          name: pagesize 
+          required: false 
+          schema: 
+           type: integer
+          example: 2
         - name: name
           in: query
-          required: false
-          schema:
-            type: integer
-        - name: phone
-          in: query
-          required: false
-          schema:
-            type: integer
-        - name: avatar
-          in: query
-          required: false
           schema:
             type: string
-            format: binary
+      responses:
+        "201": 
+          description: get users product
+          content:
+            application/json:
+              schema: 
+                type: object
+                example:
+                  message: "get all users successful"
+                  pagination:
+                    limit: 2
+                    page: 1
+                    total_page: 2
+                  data:
+                  - user_id: 1
+                    name: "Jamal"
+                    phone: "08255"
+                    avatar: "https://res.cloudinary.com/dekr35x5t/image/upload/v1702476230/be_Hi_Spec/htegoywm9rjdiepbjnzx.png"
+                  - user_id: 2
+                    name: "Eko"
+                    price: "021555"
+                    avatar: "https://res.cloudinary.com/dekr35x5t/image/upload/v1702476230/be_Hi_Spec/htegoywm9rjdiepbjnzx.png"
+                  - user_id: 3
+                    name: "Budi"
+                    price: "0866"
+                    avatar: "https://res.cloudinary.com/dekr35x5t/image/upload/v1702476230/be_Hi_Spec/htegoywm9rjdiepbjnzx.png"
+        '400':
+          $ref: "#/components/responses/400"
+        '401':
+          $ref: "#/components/responses/401"
+        '405':
+          $ref: "#/components/responses/405"
+        '500':
+          $ref: "#/components/responses/500"
+  /racks:
+    post:
+      tags:
+        - Racks
+      summary: Rack Book into library
+      description: ''
+      operationId: rackBooks
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: name
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: row
+          in: query
+          required: true
+          schema:
+            type: integer
+        - name: coloum
+          in: query
+          required: true
+          schema:
+            type: integer
       responses:
         '200':
           description: successful operation
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UpdateUser'
+                $ref: '#/components/schemas/Racks'
         '400':
-          description: Bad Request
-        '403':
-          description: Invalid Access Role
+          $ref: "#/components/responses/400"
+        '401':
+          $ref: "#/components/responses/401"
+        '405':
+          $ref: "#/components/responses/405"
+        '500':
+          $ref: "#/components/responses/500"
+    get:
+      tags:
+        - Racks
+      summary: Get racks
+      description: ''
+      operationId: getAllRacks
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: query
+          name: page 
+          required: false 
+          schema: 
+           type: integer
+          example: 1
+        - in: query
+          name: pagesize 
+          required: false 
+          schema: 
+           type: integer
+          example: 2
+        - name: name
+          in: query
+          schema:
+            type: string
+      responses:
+        "201": 
+          description: get racks product
+          content:
+            application/json:
+              schema: 
+                type: object
+                example:
+                  message: "get all racks successful"
+                  pagination:
+                    limit: 2
+                    page: 1
+                    total_page: 2
+                  data:
+                  - rack_id: 1
+                    name: 'R4'
+                    row: 4
+                    coloum: 5
+                  - rack_id: 2
+                    name: 'R6'
+                    row: 2
+                    coloum: 5
+                  - rack_id: 3
+                    name: 'R2'
+                    row: 3
+                    coloum: 5
+        '400':
+          $ref: "#/components/responses/400"
+        '401':
+          $ref: "#/components/responses/401"
+        '405':
+          $ref: "#/components/responses/405"
+        '500':
+          $ref: "#/components/responses/500"
+  /racks/{id}:
+    get:
+      tags:
+        - Racks
+      summary: Get racks
+      description: ''
+      operationId: getRacksByID
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: 
+            type: integer
+          example: 1
+      responses:
+        "201": 
+          description: get racks product
+          content:
+            application/json:
+              schema: 
+                type: object
+                example:
+                  message: "get racks successful"
+                  data:
+                  - rack_id: 1
+                    name: 'R4'
+                    row: 4
+                    coloum: 5
+        '400':
+          $ref: "#/components/responses/400"
+        '401':
+          $ref: "#/components/responses/401"
+        '405':
+          $ref: "#/components/responses/405"
+        '500':
+          $ref: "#/components/responses/500"
+    patch:
+      tags:
+        - Racks
+      summary: Update Rack Book into library
+      description: ''
+      security:
+        - bearerAuth: []
+      operationId: updateRacks
+      parameters:
+        - in: path
+          name: rack_id
+          required: true
+          schema: 
+            type: integer
+          example: 1
+      requestBody:
+        $ref: "#/components/requestBodies/updateRacks"
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Racks'
+        '400':
+          $ref: "#/components/responses/400"
+        '401':
+          $ref: "#/components/responses/401"
+        '405':
+          $ref: "#/components/responses/405"
+        '500':
+          $ref: "#/components/responses/500"
+    delete:
+      tags:
+        - Racks
+      summary: Delete Rack Book into library
+      description: ''
+      security:
+        - bearerAuth: []
+      operationId: deleteRacks
+      parameters:
+        - in: path
+          name: rack_id
+          required: true
+          schema: 
+            type: integer
+          example: 1
+      responses:
+        '204':
+          description: "delete Racks successful"
+          content:
+            application/json:
+              example:
+                message: "success delete Racks"
+        '400':
+          $ref: "#/components/responses/400"
+        '401':
+          $ref: "#/components/responses/401"
+        '405':
+          $ref: "#/components/responses/405"
+        '500':
+          $ref: "#/components/responses/500"
+
         
 components:
   schemas:
-    User:
+    Register:
       type: object
       properties:
-        id:
-          type: integer
-          format: int64
-          example: 10
-        phone:
-          type: integer
-          example: 12345
-        name:
+        message:
           type: string
-          example: theUser
-        password:
-          type: string
-          example: '12345'
-        role:
-          type: string
-          description: Role Status
-          example: 'admin'
+          example: 'Register successfully'
+        data:
+          type: object
+          properties:
+            id:
+              type: integer
+              format: int64
+              example: 10
+            phone:
+              type: string
+              example: '12345'
+            name:
+              type: string
+              example: theUser
+            password:
+              type: string
+              example: '12345'
+            role:
+              type: string
+              description: Role Status
+              example: 'user'
     Login:
       type: object
       properties:
-        id:
-          type: integer
-          format: int64
-          example: 10
-        phone:
-          type: integer
-          example: 12345
-        name:
-          type: string
-          example: theUser
-        token:
-          type: string
-          example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MDUwNDAzNjU3MzIsImlhdCI6MTcwNTAzODU2NTczMiwiaWQiOjEsInJvbGUiOiJhZG1pbiJ9.kHm8kFxSzAFQu7tj-YnCUFsTMjxa7Gdw7bueFyVDVgI
-        role:
-          type: string
-          description: Role Status
-          example: 'admin'
-      xml:
-        name: user
-    UpdateUser:
+          message:
+            type: string
+            example: 'Login successfully'
+          data:
+            type: object
+            properties:
+              id:
+                type: integer
+                format: int64
+                example: 10
+              phone:
+                type: string
+                example: '12345'
+              name:
+                type: string
+                example: theUser
+              token:
+                type: string
+                example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MDUwNDAzNjU3MzIsImlhdCI6MTcwNTAzODU2NTczMiwiaWQiOjEsInJvbGUiOiJhZG1pbiJ9.kHm8kFxSzAFQu7tj-YnCUFsTMjxa7Gdw7bueFyVDVgI
+              role:
+                type: string
+                description: Role Status
+                example: 'user'
+    Racks:
       type: object
       properties:
-        id:
-          type: integer
-          format: int64
-          example: 10
-        phone:
-          type: integer
-          example: 12345
-        name:
+          message:
+            type: string
+            example: 'Add Racks successfully'
+          data:
+            type: object
+            properties:
+              id:
+                type: integer
+                format: int64
+                example: 1
+              name:
+                type: string
+                example: 'R1'
+              row:
+                type: integer
+                format: int64
+                example: 2
+              coloum:
+                type: integer
+                format: int64
+                example: 5
+    User:
+      type: object
+      properties:
+        message:
           type: string
-          example: theUser
-        avatar:
-          type: string
-          example: avatar.jpg
-      xml:
-        name: user
+          example: 'Update User sucessfully'
+        data:
+          type: object
+          properties:
+              name:
+                type: string
+                example: 'R1'
+              phone:
+                type: string
+                example: '07346'
+              avatar:
+                type: string
+                format: binary
+                example: '18962387egWJADv'
+  requestBodies:
+    updateUser:
+      content:
+        application/json:
+          schema: 
+            $ref: "#/components/schemas/User"
+    updateRacks:
+      content:
+        application/json:
+          schema: 
+            $ref: "#/components/schemas/Racks"
   securitySchemes:
     bearerAuth:
       type: http
       scheme: bearer
       bearerFormat: JWT
+  responses:
+    "400":
+      description: "bad request"
+      content:
+        application/json:
+          example:
+            message: "bad request"
+    "401":
+      description: "unauthorized"
+      content:
+        application/json:
+          example:
+            message: "unauthorized"
+    "404":
+      description: "not found"
+      content:
+        application/json:
+          example:
+            message: "not found"
+    "405":
+      description: "method not allowed"
+      content:
+        application/json:
+          example:
+            message: "method not allowed"
+    "500":
+      description: "internal server error"
+      content:
+        application/json:
+          example:
+            message: "internal server error"
