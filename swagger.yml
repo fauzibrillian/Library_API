@@ -23,17 +23,19 @@ paths:
       summary: Login into library
       description: ''
       operationId: loginUser
-      parameters:
-        - name: phone
-          in: query
-          required: true
-          schema:
-            type: integer
-        - name: password
-          in: query
-          required: true
-          schema:
-            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                phone:
+                  type: string
+                  example: '9010370'
+                password:
+                  type: string
+                  example: 'admin123'
       responses:
         '200':
           description: successful operation
@@ -56,22 +58,22 @@ paths:
       summary: Register User into library
       description: ''
       operationId: registerUser
-      parameters:
-        - name: phone
-          in: query
-          required: true
-          schema:
-            type: integer
-        - name: name
-          in: query
-          required: true
-          schema:
-            type: string
-        - name: password
-          in: query
-          required: true
-          schema:
-            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                phone:
+                  type: string
+                  example: '092173'
+                name:
+                  type: string
+                  example: 'udin'
+                password:
+                  type: string
+                  example: 'udin123'
       responses:
         '200':
           description: successful operation
@@ -87,7 +89,7 @@ paths:
           $ref: "#/components/responses/405"
         '500':
           $ref: "#/components/responses/500"
-  /users/{id}:
+  /users/{user_id}:
     patch:
       tags:
         - Users
@@ -165,7 +167,7 @@ paths:
         - bearerAuth: []
       parameters:
         - in: path
-          name: id
+          name: user_id
           required: true
           schema: 
             type: integer
@@ -349,7 +351,7 @@ paths:
           $ref: "#/components/responses/405"
         '500':
           $ref: "#/components/responses/500"
-  /racks/{id}:
+  /racks/{rack_id}:
     get:
       tags:
         - Racks
@@ -360,7 +362,7 @@ paths:
         - bearerAuth: []
       parameters:
         - in: path
-          name: id
+          name: rack_id
           required: true
           schema: 
             type: integer
@@ -568,7 +570,7 @@ paths:
           $ref: "#/components/responses/405"
         '500':
           $ref: "#/components/responses/500"
-  /books/{id}:
+  /books/{books_id}:
     get:
       tags:
         - Books
@@ -577,7 +579,7 @@ paths:
       operationId: getBooksByID
       parameters:
         - in: path
-          name: id
+          name: book_id
           required: true
           schema: 
             type: integer
@@ -622,7 +624,7 @@ paths:
         - bearerAuth: []
       parameters:
         - in: path
-          name: id
+          name: book_id
           required: true
           schema: 
             type: integer
@@ -826,17 +828,17 @@ paths:
         '500':
           $ref: "#/components/responses/500"
 
-  /transactions/{id}:
+  /transactions/{transaction_id}:
       get:
         tags:
           - Transactions
-        summary: Transactions Book into library
+        summary: Transactions details
         description: ''
         operationId: TransactionsbyID
         security:
           - bearerAuth: []
         parameters:
-          - name: id_transaction
+          - name: transaction_id
             in: query
             required: true
             schema:
