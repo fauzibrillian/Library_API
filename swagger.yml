@@ -500,8 +500,23 @@ paths:
           description: successful operation
           content:
             application/json:
-              schema:
-                $ref: '#/components/schemas/Book'
+              schema: 
+                type: object
+                example:
+                  message: "post books successful"
+                  data:
+                  book:
+                    - book_id: 1
+                      tittle: 'Harry Potter'
+                      author: 'JH. Ronald'
+                      picture: 'https://res.cloudinary.com/dekr35x5t/image/upload/v1702476230/be_Hi_Spec/htegoywm9rjdiepbjnzx.png'
+                      category: 'Fiction'
+                      durability: 75
+                  rack:
+                    - rack_id: 1
+                      name: 'R2'
+                      coloum: 5
+                      row: 2
         '400':
           $ref: "#/components/responses/400"
         '401':
@@ -560,8 +575,6 @@ paths:
       summary: Get Books
       description: ''
       operationId: getBooksByID
-      security:
-        - bearerAuth: []
       parameters:
         - in: path
           name: id
@@ -588,6 +601,86 @@ paths:
                       durability: 75
                   rack:
                     - rack_id: 1
+                      name: 'R4'
+                      coloum: 5
+                      row: 7
+        '400':
+          $ref: "#/components/responses/400"
+        '401':
+          $ref: "#/components/responses/401"
+        '405':
+          $ref: "#/components/responses/405"
+        '500':
+          $ref: "#/components/responses/500"
+    patch:
+      tags:
+        - Books
+      summary: update Books
+      description: ''
+      operationId: updateBooksByID
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: 
+            type: integer
+          example: 1
+      requestBody:
+        $ref: "#/components/requestBodies/updateBooks"
+      responses:
+        "201": 
+          description: update books product
+          content:
+            application/json:
+              schema: 
+                type: object
+                example:
+                  message: "Update books successful"
+                  data:
+                  book:
+                    - book_id: 1
+                      tittle: 'Harry Potter'
+                      author: 'JH. Ronald'
+                      picture: 'https://res.cloudinary.com/dekr35x5t/image/upload/v1702476230/be_Hi_Spec/htegoywm9rjdiepbjnzx.png'
+                      category: 'Fiction'
+                      durability: 75
+                  rack:
+                    - rack_id: 1
+                      name: 'R4'
+                      coloum: 5
+                      row: 7
+        '400':
+          $ref: "#/components/responses/400"
+        '401':
+          $ref: "#/components/responses/401"
+        '405':
+          $ref: "#/components/responses/405"
+        '500':
+          $ref: "#/components/responses/500"
+    delete:
+      tags:
+        - Books
+      summary: Delete book into library
+      description: ''
+      security:
+        - bearerAuth: []
+      operationId: deletebooks
+      parameters:
+        - in: path
+          name: book_id
+          required: true
+          schema: 
+            type: integer
+          example: 1
+      responses:
+        '204':
+          description: "delete Books successful"
+          content:
+            application/json:
+              example:
+                message: "success delete Books"
         '400':
           $ref: "#/components/responses/400"
         '401':
@@ -597,8 +690,194 @@ paths:
         '500':
           $ref: "#/components/responses/500"
 
+  /transactions:
+    post:
+      tags:
+        - Transactions
+      summary: Transactions Book into library
+      description: ''
+      operationId: transactions
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: user_id
+          in: query
+          required: true
+          schema:
+            type: integer
+        - name: book_id
+          in: query
+          required: true
+          schema:
+            type: integer
+        - name: date_borrow
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date-time
+        - name: date_return
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date-time
+        - name: date_should_return
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date-time
+      responses:
+        "201": 
+          description: Post transactions
+          content:
+            application/json:
+              schema: 
+                type: object
+                example:
+                  message: "Post transactions successful"
+                  data:
+                  user:
+                    - user_id: 2
+                      name: 'udin'
+                      phone: 90702130
+                      avatar: 'https://res.cloudinary.com/dekr35x5t/image/upload/v1702476230/be_Hi_Spec/htegoywm9rjdiepbjnzx.png'
+                  book:
+                    - book_id: 1
+                      tittle: 'Harry Potter'
+                      author: 'JH. Ronald'
+                      picture: 'https://res.cloudinary.com/dekr35x5t/image/upload/v1702476230/be_Hi_Spec/htegoywm9rjdiepbjnzx.png'
+                      category: 'Fiction'
+                      durability: 75
+                  date_borrow: '2024-07-21T17:32:28Z'
+                  date_return: '2024-08-21T17:32:28Z'
+                  date_should_return: '2024-07-25T17:32:28Z'
+        '400':
+          $ref: "#/components/responses/400"
+        '401':
+          $ref: "#/components/responses/401"
+        '405':
+          $ref: "#/components/responses/405"
+        '500':
+          $ref: "#/components/responses/500"
+    get:
+      tags:
+        - Transactions
+      summary: All Transactions Book into library
+      description: ''
+      operationId: alltransactions
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id_transaction
+          in: query
+          required: true
+          schema:
+            type: integer
+      responses:
+        "201": 
+          description: update books product
+          content:
+            application/json:
+              schema: 
+                type: object
+                example:
+                  message: "Update books successful"
+                  data:
+                    user:
+                      - user_id: 2
+                        name: 'udin'
+                        phone: '90702130'
+                        avatar: 'https://res.cloudinary.com/dekr35x5t/image/upload/v1702476230/be_Hi_Spec/htegoywm9rjdiepbjnzx.png'
+                    book:
+                      - book_id: 1
+                        tittle: 'Harry Potter'
+                        author: 'JH. Ronald'
+                        picture: 'https://res.cloudinary.com/dekr35x5t/image/upload/v1702476230/be_Hi_Spec/htegoywm9rjdiepbjnzx.png'
+                        category: 'Fiction'
+                        durability: 75
+                    date_borrow: '2024-07-21T17:32:28Z'
+                    date_return: '2024-08-21T17:32:28Z'
+                    date_should_return: '2024-07-25T17:32:28Z'
+                  properties:
+                      user:
+                        - user_id: 2
+                          name: 'udin'
+                          phone: '90702130'
+                          avatar: 'https://res.cloudinary.com/dekr35x5t/image/upload/v1702476230/be_Hi_Spec/htegoywm9rjdiepbjnzx.png'
+                      book:
+                        - book_id: 1
+                          tittle: 'Harry Potter'
+                          author: 'JH. Ronald'
+                          picture: 'https://res.cloudinary.com/dekr35x5t/image/upload/v1702476230/be_Hi_Spec/htegoywm9rjdiepbjnzx.png'
+                          category: 'Fiction'
+                          durability: 75
+                      date_borrow: '2024-07-21T17:32:28Z'
+                      date_return: '2024-08-21T17:32:28Z'
+                      date_should_return: '2024-07-25T17:32:28Z'
 
-        
+        '400':
+          $ref: "#/components/responses/400"
+        '401':
+          $ref: "#/components/responses/401"
+        '405':
+          $ref: "#/components/responses/405"
+        '500':
+          $ref: "#/components/responses/500"
+
+  /transactions/{id}:
+      get:
+        tags:
+          - Transactions
+        summary: Transactions Book into library
+        description: ''
+        operationId: TransactionsbyID
+        security:
+          - bearerAuth: []
+        parameters:
+          - name: id_transaction
+            in: query
+            required: true
+            schema:
+              type: integer
+        responses:
+          "201": 
+            description: get transactions
+            content:
+              application/json:
+                schema: 
+                  type: object
+                  example:
+                    message: "get transactions successful"
+                    data:
+                      user:
+                        - user_id: 2
+                          name: 'udin'
+                          phone: '90702130'
+                          avatar: 'https://res.cloudinary.com/dekr35x5t/image/upload/v1702476230/be_Hi_Spec/htegoywm9rjdiepbjnzx.png'
+                      book:
+                        - book_id: 1
+                          tittle: 'Harry Potter'
+                          author: 'JH. Ronald'
+                          picture: 'https://res.cloudinary.com/dekr35x5t/image/upload/v1702476230/be_Hi_Spec/htegoywm9rjdiepbjnzx.png'
+                          category: 'Fiction'
+                          durability: 75
+                      date_borrow: '2024-07-21T17:32:28Z'
+                      date_return: '2024-08-21T17:32:28Z'
+                      date_should_return: '2024-07-25T17:32:28Z'
+          '400':
+            $ref: "#/components/responses/400"
+          '401':
+            $ref: "#/components/responses/401"
+          '405':
+            $ref: "#/components/responses/405"
+          '500':
+            $ref: "#/components/responses/500"
+
+
+
+    
 components:
   schemas:
     Register:
@@ -656,9 +935,6 @@ components:
     Racks:
       type: object
       properties:
-          message:
-            type: string
-            example: 'Add Racks successfully'
           data:
             type: object
             properties:
@@ -701,7 +977,7 @@ components:
       properties:
         message:
           type: string
-          example: 'Add Book sucessfully'
+          example: 'Update Book sucessfully'
         data:
           type: object
           properties:
@@ -727,23 +1003,14 @@ components:
               rack_book:
                 type: object
                 properties:
-                  id_rack:
+                  rack_id:
                     type: integer
                     example: 1
-                  name:
-                    type: string 
-                    example: 'R2'
-                  row:
-                    type: integer
-                    example: 4
-                  coloum:
-                    type: integer
-                    example: 6
   requestBodies:
     updateBooks:
       content:
         application/json:
-          schema: 
+          schema:
             $ref: "#/components/schemas/Book"
     updateUser:
       content:
