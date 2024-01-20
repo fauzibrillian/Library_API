@@ -27,3 +27,5 @@ MVP
 
 
 - link ERD : https://drive.google.com/file/d/1jYwDdKvuOOrMqow5Ml7rp-nEp59C9pY0/view
+
+- OPEN API : https://app.swaggerhub.com/apis/FauziBrillianAnanta/library_api/1.0
