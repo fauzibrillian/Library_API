@@ -69,21 +69,3 @@ func (bs *BookServices) DelBook(token *golangjwt.Token, bookID uint) error {
 	err = bs.repo.DelBook(userId, bookID)
 	return err
 }
-
-// AddDetail implements book.Service.
-func (bs *BookServices) AddDetail(token *golangjwt.Token, newDetail book.Book, newRack book.Rack) (book.BookDetail, error) {
-	userId, rolesUser, err := jwt.ExtractToken(token)
-	if err != nil {
-		return book.BookDetail{}, errors.New("token Error")
-	}
-	if rolesUser != "admin" {
-		return book.BookDetail{}, errors.New("unauthorized access: admin role required")
-	}
-
-	result, err := bs.repo.InsertDetail(userId, newDetail, newRack)
-	if err != nil {
-		return book.BookDetail{}, errors.New("inputan tidak boleh kosong")
-	}
-
-	return result, err
-}

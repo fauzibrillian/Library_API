@@ -10,7 +10,7 @@ type User struct {
 	gorm.Model
 	ID          uint   `json:"id"`
 	Name        string `json:"name"`
-	Phone       string `json:"phone"`
+	Email       string `json:"email"`
 	Password    string `json:"password"`
 	NewPassword string `json:"new_password"`
 	Avatar      string `json:"avatar"`
@@ -26,7 +26,7 @@ type Handler interface {
 }
 
 type Service interface {
-	Login(phone string, password string) (User, error)
+	Login(email string, password string) (User, error)
 	Register(newUser User) (User, error)
 	ResetPassword(token *jwt.Token, input User) (User, error)
 	UpdateUser(token *jwt.Token, input User) (User, error)
@@ -34,7 +34,7 @@ type Service interface {
 }
 
 type Repository interface {
-	Login(phone string) (User, error)
+	Login(email string) (User, error)
 	Register(newUser User) (User, error)
 	ResetPassword(input User) (User, error)
 	UpdateUser(input User) (User, error)

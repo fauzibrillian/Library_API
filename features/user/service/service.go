@@ -23,11 +23,11 @@ func New(r user.Repository, h enkrip.HashInterface) user.Service {
 }
 
 // Login implements user.Service.
-func (us *UserService) Login(phone string, password string) (user.User, error) {
-	if phone == "" || password == "" {
-		return user.User{}, errors.New("phone and password are required")
+func (us *UserService) Login(email string, password string) (user.User, error) {
+	if email == "" || password == "" {
+		return user.User{}, errors.New("email and password are required")
 	}
-	result, err := us.repo.Login(phone)
+	result, err := us.repo.Login(email)
 
 	if err != nil {
 		if strings.Contains(err.Error(), "not found") {
@@ -50,8 +50,8 @@ func (us *UserService) Register(newUser user.User) (user.User, error) {
 	if newUser.Name == "" {
 		return user.User{}, errors.New("name cannot be empty")
 	}
-	if newUser.Phone == "" {
-		return user.User{}, errors.New("phone cannot be empty")
+	if newUser.Email == "" {
+		return user.User{}, errors.New("email cannot be empty")
 	}
 	if newUser.Password == "" {
 		return user.User{}, errors.New("password cannot be empty")
