@@ -169,3 +169,21 @@ func (us *UserService) DeleteUser(token *golangjwt.Token, userID uint) error {
 
 	return nil
 }
+
+// SearchUser implements user.Service.
+func (us *UserService) SearchUser(token *golangjwt.Token, name string, page uint, limit uint) ([]user.User, uint, error) {
+	userId, rolesUser, err := jwt.ExtractToken(token)
+	if err != nil {
+		return []user.User{}, 0, errors.New("harap login")
+	}
+	if rolesUser != "admin" {
+		return []user.User{}, 0, errors.New("you don't have permission to access this page")
+	}
+
+	users, totalPage, err := us.repo.SearchUser(userId, name, page, limit)
+	if err != nil {
+		return nil, 0, err
+	}
+
+	return users, totalPage, err
+}

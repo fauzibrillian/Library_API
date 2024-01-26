@@ -165,3 +165,43 @@ func (uq *UserQuery) DeleteUser(userID uint) error {
 
 	return nil
 }
+
+// SearchUser implements user.Repository.
+func (uq *UserQuery) SearchUser(userID uint, name string, page uint, limit uint) ([]user.User, uint, error) {
+	var users []UserModel
+	qry := uq.db.Table("user_models")
+
+	if name != "" {
+		qry = qry.Where("name like ?", "%"+name+"%")
+		qry = qry.Where("deleted_at IS NULL")
+	}
+	var totalUser int64
+	if err := qry.Count(&totalUser).Error; err != nil {
+		return nil, 0, err
+	}
+
+	offset := (page - 1) * limit
+	qry = qry.Offset(int(offset)).Limit(int(limit))
+
+	if err := qry.Find(&users).Error; err != nil {
+		return nil, 0, err
+	}
+
+	var result []user.User
+	for _, s := range users {
+		result = append(result, user.User{
+			ID:     s.ID,
+			Name:   s.Name,
+			Email:  s.Email,
+			Avatar: s.Avatar,
+			Role:   s.Role,
+		})
+	}
+
+	totalPages := int(totalUser) / int(limit)
+	if totalUser%int64(limit) != 0 {
+		totalPages++
+	}
+
+	return result, uint(totalPages), nil
+}

@@ -26,6 +26,8 @@ func RouteUser(e *echo.Echo, uc user.Handler) {
 	e.PATCH("/resetpassword/:id", uc.ResetPassword(), echojwt.JWT([]byte(config.InitConfig().JWT)))
 	e.PATCH("/user/:id", uc.UpdateUser(), echojwt.JWT([]byte(config.InitConfig().JWT)))
 	e.DELETE("/user/:id", uc.Delete(), echojwt.JWT([]byte(config.InitConfig().JWT)))
+	e.GET("/users", uc.SearchUser(), echojwt.JWT([]byte(config.InitConfig().JWT)))
+
 }
 
 func RouteBook(e *echo.Echo, bh book.Handler) {

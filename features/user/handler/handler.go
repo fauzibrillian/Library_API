@@ -374,3 +374,42 @@ func (uc *UserController) Delete() echo.HandlerFunc {
 		})
 	}
 }
+
+// SearchUser implements user.Handler.
+func (uc *UserController) SearchUser() echo.HandlerFunc {
+	return func(c echo.Context) error {
+		page, err := strconv.Atoi(c.QueryParam("page"))
+		if err != nil || page <= 0 {
+			page = 1
+		}
+
+		limit, err := strconv.Atoi(c.QueryParam("limit"))
+		if err != nil || limit <= 0 {
+			limit = 10
+		}
+
+		name := c.QueryParam("name")
+		uintPage := uint(page)
+		uintLimit := uint(limit)
+
+		products, totalPage, err := uc.srv.SearchUser(c.Get("user").(*gojwt.Token), name, uintPage, uintLimit)
+		if err != nil {
+			return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
+		}
+		var response []SearchUserResponse
+		for _, result := range products {
+			response = append(response, SearchUserResponse{
+				ID:     result.ID,
+				Email:  result.Email,
+				Name:   result.Name,
+				Avatar: result.Avatar,
+				Role:   result.Role,
+			})
+		}
+		return c.JSON(http.StatusOK, map[string]interface{}{
+			"message":    "Search User Successful",
+			"data":       response,
+			"pagination": map[string]interface{}{"page": page, "limit": limit, "total_page": totalPage},
+		})
+	}
+}
