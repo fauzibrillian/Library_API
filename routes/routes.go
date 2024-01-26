@@ -3,7 +3,6 @@ package routes
 import (
 	"library_api/config"
 	"library_api/features/book"
-	"library_api/features/rack"
 	"library_api/features/user"
 
 	echojwt "github.com/labstack/echo-jwt/v4"
@@ -11,7 +10,7 @@ import (
 	"github.com/labstack/echo/v4/middleware"
 )
 
-func InitRoute(e *echo.Echo, uc user.Handler, bh book.Handler, rh rack.Handler) {
+func InitRoute(e *echo.Echo, uc user.Handler, bh book.Handler) {
 	e.Pre(middleware.RemoveTrailingSlash())
 
 	e.Use(middleware.CORS())
@@ -19,7 +18,6 @@ func InitRoute(e *echo.Echo, uc user.Handler, bh book.Handler, rh rack.Handler) 
 
 	RouteUser(e, uc)
 	RouteBook(e, bh)
-	RouteRack(e, rh)
 }
 
 func RouteUser(e *echo.Echo, uc user.Handler) {
