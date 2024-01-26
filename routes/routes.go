@@ -35,7 +35,3 @@ func RouteBook(e *echo.Echo, bh book.Handler) {
 	e.PATCH("/book/:id", bh.UpdateBook(), echojwt.JWT([]byte(config.InitConfig().JWT)))
 	e.DELETE("/book/:id", bh.DeleteBook(), echojwt.JWT([]byte(config.InitConfig().JWT)))
 }
-
-func RouteRack(e *echo.Echo, rh rack.Handler) {
-	e.POST("/rack", rh.AddRack(), echojwt.JWT([]byte(config.InitConfig().JWT)))
-}
