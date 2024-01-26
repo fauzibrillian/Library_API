@@ -9,7 +9,7 @@ import (
 
 type UserModel struct {
 	gorm.Model
-	Phone    string `json:"phone" form:"phone" gorm:"unique"`
+	Email    string `json:"email" form:"email" gorm:"unique"`
 	Name     string `json:"name" form:"name"`
 	Password string `json:"password" form:"password"`
 	Avatar   string `json:"avatar" form:"avatar"`
@@ -27,17 +27,17 @@ func New(db *gorm.DB) user.Repository {
 }
 
 // Login implements user.Repository.
-func (uq *UserQuery) Login(phone string) (user.User, error) {
+func (uq *UserQuery) Login(email string) (user.User, error) {
 	var userData = new(UserModel)
 
-	if err := uq.db.Where("phone = ?", phone).First(userData).Error; err != nil {
+	if err := uq.db.Where("email = ?", email).First(userData).Error; err != nil {
 		return user.User{}, err
 	}
 
 	var result = new(user.User)
 	result.ID = userData.ID
 	result.Name = userData.Name
-	result.Phone = userData.Phone
+	result.Email = userData.Email
 	result.Password = userData.Password
 	result.Role = userData.Role
 
@@ -48,7 +48,7 @@ func (uq *UserQuery) Login(phone string) (user.User, error) {
 func (uq *UserQuery) Register(newUser user.User) (user.User, error) {
 	var inputDB = new(UserModel)
 	inputDB.Name = newUser.Name
-	inputDB.Phone = newUser.Phone
+	inputDB.Email = newUser.Email
 	inputDB.Password = newUser.Password
 	inputDB.Role = "user"
 
@@ -77,7 +77,7 @@ func (uq *UserQuery) GetUserByID(userID uint) (*user.User, error) {
 	result := &user.User{
 		ID:       userModel.ID,
 		Name:     userModel.Name,
-		Phone:    userModel.Phone,
+		Email:    userModel.Email,
 		Password: userModel.Password,
 	}
 
@@ -107,7 +107,7 @@ func (uq *UserQuery) ResetPassword(input user.User) (user.User, error) {
 	result := user.User{
 		ID:       proses.ID,
 		Name:     proses.Name,
-		Phone:    proses.Phone,
+		Email:    proses.Email,
 		Password: proses.Password,
 	}
 
@@ -129,8 +129,8 @@ func (uq *UserQuery) UpdateUser(input user.User) (user.User, error) {
 	if input.Name != "" {
 		proses.Name = input.Name
 	}
-	if input.Phone != "" {
-		proses.Phone = input.Phone
+	if input.Email != "" {
+		proses.Email = input.Email
 	}
 
 	if input.Avatar != "" {
@@ -144,7 +144,7 @@ func (uq *UserQuery) UpdateUser(input user.User) (user.User, error) {
 	result := user.User{
 		ID:     proses.ID,
 		Name:   proses.Name,
-		Phone:  proses.Phone,
+		Email:  proses.Email,
 		Avatar: proses.Avatar,
 	}
 

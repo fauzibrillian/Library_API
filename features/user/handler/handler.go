@@ -41,13 +41,13 @@ func (uc *UserController) Login() echo.HandlerFunc {
 			})
 		}
 
-		result, err := uc.srv.Login(input.Phone, input.Password)
+		result, err := uc.srv.Login(input.Email, input.Password)
 
 		if err != nil {
 			c.Logger().Error("ERROR Login, explain:", err.Error())
 			if strings.Contains(err.Error(), "not found") {
 				return c.JSON(http.StatusNotFound, map[string]any{
-					"message": "phone tidak ditemukan",
+					"message": "email tidak ditemukan",
 				})
 			}
 			if strings.Contains(err.Error(), "password salah") {
@@ -56,7 +56,7 @@ func (uc *UserController) Login() echo.HandlerFunc {
 				})
 			}
 			return c.JSON(http.StatusInternalServerError, map[string]any{
-				"message": "phone tidak di temukan",
+				"message": "email tidak di temukan",
 			})
 		}
 
@@ -70,7 +70,7 @@ func (uc *UserController) Login() echo.HandlerFunc {
 		var response = new(LoginResponse)
 		response.ID = result.ID
 		response.Name = result.Name
-		response.Phone = result.Phone
+		response.Email = result.Email
 		response.Role = result.Role
 		response.Token = strToken
 
@@ -91,7 +91,7 @@ func (uc *UserController) Register() echo.HandlerFunc {
 			})
 		}
 		var inputProses = new(user.User)
-		inputProses.Phone = input.Phone
+		inputProses.Email = input.Email
 		inputProses.Name = input.Name
 		inputProses.Password = input.Password
 
@@ -109,7 +109,7 @@ func (uc *UserController) Register() echo.HandlerFunc {
 		}
 		var response = new(RegisterResponse)
 		response.ID = result.ID
-		response.Phone = result.Phone
+		response.Email = result.Email
 		response.Name = result.Name
 
 		return c.JSON(http.StatusCreated, map[string]any{
@@ -220,7 +220,7 @@ func (uc *UserController) UpdateUser() echo.HandlerFunc {
 				var inputProcess = new(user.User)
 				inputProcess.Avatar = ""
 				inputProcess.ID = uint(userID)
-				inputProcess.Phone = input.Phone
+				inputProcess.Email = input.Email
 				inputProcess.Name = input.Name
 
 				result, err := uc.srv.UpdateUser(c.Get("user").(*gojwt.Token), *inputProcess)
@@ -255,7 +255,7 @@ func (uc *UserController) UpdateUser() echo.HandlerFunc {
 				var response = new(PutUserResponse)
 				response.ID = result.ID
 				response.Name = result.Name
-				response.Phone = result.Phone
+				response.Email = result.Email
 				response.Avatar = result.Avatar
 
 				return c.JSON(http.StatusCreated, map[string]any{
@@ -299,7 +299,7 @@ func (uc *UserController) UpdateUser() echo.HandlerFunc {
 		var inputProcess = new(user.User)
 		inputProcess.Avatar = link
 		inputProcess.ID = uint(userID)
-		inputProcess.Phone = input.Phone
+		inputProcess.Email = input.Email
 		inputProcess.Name = input.Name
 
 		result, err := uc.srv.UpdateUser(c.Get("user").(*gojwt.Token), *inputProcess)
@@ -330,7 +330,7 @@ func (uc *UserController) UpdateUser() echo.HandlerFunc {
 		var response = new(PutUserResponse)
 		response.ID = result.ID
 		response.Name = result.Name
-		response.Phone = result.Phone
+		response.Email = result.Email
 		response.Avatar = result.Avatar
 
 		return c.JSON(http.StatusCreated, map[string]any{

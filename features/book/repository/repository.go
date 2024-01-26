@@ -9,13 +9,11 @@ import (
 
 type BookModel struct {
 	gorm.Model
-	Tittle      string
-	Publisher   string
-	Author      string
-	Picture     string
-	Category    string
-	Stock       uint
-	BookDetails []BookDetail `gorm:"foreignKey:BookID;"`
+	Tittle    string
+	Publisher string
+	Author    string
+	Picture   string
+	Category  string
 }
 
 type BookDetail struct {
@@ -56,7 +54,6 @@ func (bq *BookQuery) InsertBook(userID uint, newBook book.Book) (book.Book, erro
 	inputDB.Author = newBook.Author
 	inputDB.Picture = newBook.Picture
 	inputDB.Category = newBook.Category
-	inputDB.Stock = newBook.Stock
 
 	if err := bq.db.Create(&inputDB).Error; err != nil {
 		return book.Book{}, err
@@ -93,9 +90,6 @@ func (bq *BookQuery) UpdateBook(userID uint, bookID uint, input book.Book) (book
 	if input.Category != "" {
 		proses.Category = input.Category
 	}
-	if input.Stock != 0 {
-		proses.Stock = input.Stock
-	}
 
 	if input.Picture != "" {
 		proses.Picture = input.Picture
@@ -111,7 +105,6 @@ func (bq *BookQuery) UpdateBook(userID uint, bookID uint, input book.Book) (book
 		Tittle:    proses.Tittle,
 		Publisher: proses.Publisher,
 		Author:    proses.Author,
-		Stock:     uint(proses.Stock),
 		Picture:   proses.Picture,
 	}
 	return result, nil
