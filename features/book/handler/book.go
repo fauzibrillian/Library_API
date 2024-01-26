@@ -47,7 +47,6 @@ func (bh *BookHandler) AddBook() echo.HandlerFunc {
 					Publisher: input.Publisher,
 					Author:    input.Author,
 					Picture:   "",
-					Category:  input.Category,
 				}
 
 				result, err := bh.s.AddBook(c.Get("user").(*golangjwt.Token), *inputProcess)
@@ -73,7 +72,6 @@ func (bh *BookHandler) AddBook() echo.HandlerFunc {
 				response.Publisher = result.Publisher
 				response.Author = result.Author
 				response.Picture = result.Picture
-				response.Category = result.Category
 
 				return c.JSON(http.StatusCreated, map[string]any{
 					"message": "Success Create Book Data",
@@ -115,7 +113,6 @@ func (bh *BookHandler) AddBook() echo.HandlerFunc {
 		inputProcess.Publisher = input.Publisher
 		inputProcess.Author = input.Author
 		inputProcess.Tittle = input.Tittle
-		inputProcess.Category = input.Category
 		inputProcess.Picture = link
 
 		result, err := bh.s.AddBook(c.Get("user").(*golangjwt.Token), *inputProcess)
@@ -149,7 +146,6 @@ func (bh *BookHandler) AddBook() echo.HandlerFunc {
 		response.Publisher = result.Publisher
 		response.Author = result.Author
 		response.Picture = result.Picture
-		response.Category = result.Category
 
 		return c.JSON(http.StatusOK, map[string]any{
 			"message": "Success Created Book Data",
@@ -187,7 +183,6 @@ func (bh *BookHandler) UpdateBook() echo.HandlerFunc {
 				}
 				updatedBook := book.Book{
 					ID:        input.ID,
-					Category:  input.Category,
 					Tittle:    input.Tittle,
 					Author:    input.Author,
 					Publisher: input.Publisher,
@@ -216,7 +211,6 @@ func (bh *BookHandler) UpdateBook() echo.HandlerFunc {
 
 				var response = new(BookPutResponse)
 				response.ID = result.ID
-				response.Category = result.Category
 				response.Tittle = result.Tittle
 				response.Author = result.Author
 				response.Picture = result.Picture
@@ -262,7 +256,6 @@ func (bh *BookHandler) UpdateBook() echo.HandlerFunc {
 
 		updatedBook := book.Book{
 			ID:        input.ID,
-			Category:  input.Category,
 			Tittle:    input.Tittle,
 			Author:    input.Author,
 			Publisher: input.Publisher,
@@ -291,7 +284,6 @@ func (bh *BookHandler) UpdateBook() echo.HandlerFunc {
 
 		var response = new(BookPutResponse)
 		response.ID = result.ID
-		response.Category = result.Category
 		response.Tittle = result.Tittle
 		response.Publisher = result.Publisher
 		response.Author = result.Author

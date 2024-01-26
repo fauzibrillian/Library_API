@@ -11,7 +11,6 @@ type Book struct {
 	Publisher string `json:"publisher"`
 	Author    string `json:"author"`
 	Picture   string `json:"picture"`
-	Category  string `json:"category"`
 }
 
 type Handler interface {
