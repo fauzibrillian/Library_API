@@ -35,4 +35,5 @@ func RouteBook(e *echo.Echo, bh book.Handler) {
 	e.PATCH("/books/:id", bh.UpdateBook(), echojwt.JWT([]byte(config.InitConfig().JWT)))
 	e.DELETE("/books/:id", bh.DeleteBook(), echojwt.JWT([]byte(config.InitConfig().JWT)))
 	e.GET("/books", bh.SearchBook())
+	e.GET("/books/:id", bh.GetBook())
 }

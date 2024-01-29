@@ -74,8 +74,18 @@ func (bs *BookServices) DelBook(token *golangjwt.Token, bookID uint) error {
 func (bs *BookServices) SearchBook(tittle string, page uint, limit uint) ([]book.Book, uint, error) {
 	books, totalPage, err := bs.repo.SearchBook(tittle, page, limit)
 	if err != nil {
-		return nil, 0, err
+		return nil, 0, errors.New("failed get books data")
 	}
 
 	return books, totalPage, err
+}
+
+// GetBook implements book.Service.
+func (bs *BookServices) GetBook(bookID uint) (book.Book, error) {
+	books, err := bs.repo.GetBook(bookID)
+	if err != nil {
+		return book.Book{}, errors.New("failed get books data")
+	}
+
+	return *books, err
 }

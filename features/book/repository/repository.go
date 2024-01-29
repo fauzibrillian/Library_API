@@ -118,11 +118,9 @@ func (bq *BookQuery) SearchBook(tittle string, page uint, limit uint) ([]book.Bo
 	var result []book.Book
 	for _, s := range books {
 		result = append(result, book.Book{
-			ID:        s.ID,
-			Tittle:    s.Tittle,
-			Publisher: s.Publisher,
-			Author:    s.Author,
-			Picture:   s.Picture,
+			ID:      s.ID,
+			Tittle:  s.Tittle,
+			Picture: s.Picture,
 		})
 	}
 
@@ -132,4 +130,20 @@ func (bq *BookQuery) SearchBook(tittle string, page uint, limit uint) ([]book.Bo
 	}
 
 	return result, uint(totalPages), nil
+}
+
+// GetBook implements book.Repository.
+func (bq *BookQuery) GetBook(bookID uint) (*book.Book, error) {
+	var books BookModel
+	if err := bq.db.First(&books, bookID).Error; err != nil {
+		return nil, err
+	}
+	result := &book.Book{
+		ID:        books.ID,
+		Tittle:    books.Tittle,
+		Publisher: books.Publisher,
+		Author:    books.Author,
+		Picture:   books.Picture,
+	}
+	return result, nil
 }

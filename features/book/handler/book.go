@@ -353,20 +353,50 @@ func (bh *BookHandler) SearchBook() echo.HandlerFunc {
 		if err != nil {
 			return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
 		}
-		var response []BookResponse
+		var response []SearchBookResponse
 		for _, result := range books {
-			response = append(response, BookResponse{
-				ID:        result.ID,
-				Tittle:    result.Tittle,
-				Publisher: result.Publisher,
-				Author:    result.Author,
-				Picture:   result.Picture,
+			response = append(response, SearchBookResponse{
+				ID:      result.ID,
+				Tittle:  result.Tittle,
+				Picture: result.Picture,
 			})
 		}
 		return c.JSON(http.StatusOK, map[string]interface{}{
-			"message":    "Search Book Successful",
+			"message":    "Get Book Successful",
 			"data":       response,
 			"pagination": map[string]interface{}{"page": page, "limit": limit, "total_page": totalPage},
+		})
+	}
+}
+
+// GetBook implements book.Handler.
+func (bh *BookHandler) GetBook() echo.HandlerFunc {
+	return func(c echo.Context) error {
+		bookID, err := strconv.ParseUint(c.Param("id"), 10, 64)
+		if err != nil {
+			return c.JSON(http.StatusBadRequest, map[string]interface{}{
+				"message": "ID book tidak valid",
+				"data":    nil,
+			})
+		}
+
+		result, err := bh.s.GetBook(uint(bookID))
+		if err != nil {
+			c.Logger().Error("Error fetching product: ", err.Error())
+			return c.JSON(http.StatusInternalServerError, map[string]interface{}{
+				"message": "Failed to retrieve product data",
+			})
+		}
+		var response = new(BookResponse)
+		response.ID = result.ID
+		response.Tittle = result.Tittle
+		response.Publisher = result.Publisher
+		response.Author = result.Author
+		response.Picture = result.Picture
+
+		return c.JSON(http.StatusOK, map[string]interface{}{
+			"message": "Get Details Books Successful",
+			"data":    response,
 		})
 	}
 }
