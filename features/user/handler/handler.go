@@ -392,12 +392,12 @@ func (uc *UserController) SearchUser() echo.HandlerFunc {
 		uintPage := uint(page)
 		uintLimit := uint(limit)
 
-		products, totalPage, err := uc.srv.SearchUser(c.Get("user").(*gojwt.Token), name, uintPage, uintLimit)
+		users, totalPage, err := uc.srv.SearchUser(c.Get("user").(*gojwt.Token), name, uintPage, uintLimit)
 		if err != nil {
 			return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
 		}
 		var response []SearchUserResponse
-		for _, result := range products {
+		for _, result := range users {
 			response = append(response, SearchUserResponse{
 				ID:     result.ID,
 				Email:  result.Email,
