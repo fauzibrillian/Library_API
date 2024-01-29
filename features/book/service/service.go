@@ -69,3 +69,13 @@ func (bs *BookServices) DelBook(token *golangjwt.Token, bookID uint) error {
 	err = bs.repo.DelBook(userId, bookID)
 	return err
 }
+
+// SearchBook implements book.Service.
+func (bs *BookServices) SearchBook(tittle string, page uint, limit uint) ([]book.Book, uint, error) {
+	books, totalPage, err := bs.repo.SearchBook(tittle, page, limit)
+	if err != nil {
+		return nil, 0, err
+	}
+
+	return books, totalPage, err
+}

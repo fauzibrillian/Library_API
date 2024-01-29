@@ -49,3 +49,11 @@ type PutUserResponse struct {
 	Email  string `json:"email" form:"email"`
 	Avatar string `json:"avatar" form:"avatar"`
 }
+
+type SearchUserResponse struct {
+	ID     uint   `json:"user_id" form:"user_id"`
+	Name   string `json:"name" form:"name"`
+	Email  string `json:"email" form:"email"`
+	Avatar string `json:"avatar" form:"avatar"`
+	Role   string `json:"role" form:"role"`
+}

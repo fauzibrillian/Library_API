@@ -24,12 +24,15 @@ func RouteUser(e *echo.Echo, uc user.Handler) {
 	e.POST("/login", uc.Login())
 	e.POST("/register", uc.Register())
 	e.PATCH("/resetpassword/:id", uc.ResetPassword(), echojwt.JWT([]byte(config.InitConfig().JWT)))
-	e.PATCH("/user/:id", uc.UpdateUser(), echojwt.JWT([]byte(config.InitConfig().JWT)))
-	e.DELETE("/user/:id", uc.Delete(), echojwt.JWT([]byte(config.InitConfig().JWT)))
+	e.PATCH("/users/:id", uc.UpdateUser(), echojwt.JWT([]byte(config.InitConfig().JWT)))
+	e.DELETE("/users/:id", uc.Delete(), echojwt.JWT([]byte(config.InitConfig().JWT)))
+	e.GET("/users", uc.SearchUser(), echojwt.JWT([]byte(config.InitConfig().JWT)))
+
 }
 
 func RouteBook(e *echo.Echo, bh book.Handler) {
-	e.POST("/book", bh.AddBook(), echojwt.JWT([]byte(config.InitConfig().JWT)))
-	e.PATCH("/book/:id", bh.UpdateBook(), echojwt.JWT([]byte(config.InitConfig().JWT)))
-	e.DELETE("/book/:id", bh.DeleteBook(), echojwt.JWT([]byte(config.InitConfig().JWT)))
+	e.POST("/books", bh.AddBook(), echojwt.JWT([]byte(config.InitConfig().JWT)))
+	e.PATCH("/books/:id", bh.UpdateBook(), echojwt.JWT([]byte(config.InitConfig().JWT)))
+	e.DELETE("/books/:id", bh.DeleteBook(), echojwt.JWT([]byte(config.InitConfig().JWT)))
+	e.GET("/books", bh.SearchBook())
 }

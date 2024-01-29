@@ -331,3 +331,42 @@ func (bh *BookHandler) DeleteBook() echo.HandlerFunc {
 		})
 	}
 }
+
+// SearchBook implements book.Handler.
+func (bh *BookHandler) SearchBook() echo.HandlerFunc {
+	return func(c echo.Context) error {
+		page, err := strconv.Atoi(c.QueryParam("page"))
+		if err != nil || page <= 0 {
+			page = 1
+		}
+
+		limit, err := strconv.Atoi(c.QueryParam("limit"))
+		if err != nil || limit <= 0 {
+			limit = 10
+		}
+
+		tittle := c.QueryParam("tittle")
+		uintPage := uint(page)
+		uintLimit := uint(limit)
+
+		books, totalPage, err := bh.s.SearchBook(tittle, uintPage, uintLimit)
+		if err != nil {
+			return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
+		}
+		var response []BookResponse
+		for _, result := range books {
+			response = append(response, BookResponse{
+				ID:        result.ID,
+				Tittle:    result.Tittle,
+				Publisher: result.Publisher,
+				Author:    result.Author,
+				Picture:   result.Picture,
+			})
+		}
+		return c.JSON(http.StatusOK, map[string]interface{}{
+			"message":    "Search Book Successful",
+			"data":       response,
+			"pagination": map[string]interface{}{"page": page, "limit": limit, "total_page": totalPage},
+		})
+	}
+}
