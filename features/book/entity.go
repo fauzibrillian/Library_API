@@ -18,6 +18,7 @@ type Handler interface {
 	UpdateBook() echo.HandlerFunc
 	DeleteBook() echo.HandlerFunc
 	SearchBook() echo.HandlerFunc
+	GetBook() echo.HandlerFunc
 }
 
 type Service interface {
@@ -25,6 +26,7 @@ type Service interface {
 	UpdateBook(token *jwt.Token, bookID uint, input Book) (Book, error)
 	DelBook(token *jwt.Token, bookID uint) error
 	SearchBook(tittle string, page uint, limit uint) ([]Book, uint, error)
+	GetBook(bookID uint) (Book, error)
 }
 
 type Repository interface {
@@ -32,4 +34,5 @@ type Repository interface {
 	UpdateBook(userID uint, bookID uint, input Book) (Book, error)
 	DelBook(userID uint, bookID uint) error
 	SearchBook(tittle string, page uint, limit uint) ([]Book, uint, error)
+	GetBook(bookID uint) (*Book, error)
 }
