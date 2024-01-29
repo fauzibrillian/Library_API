@@ -118,11 +118,9 @@ func (bq *BookQuery) SearchBook(tittle string, page uint, limit uint) ([]book.Bo
 	var result []book.Book
 	for _, s := range books {
 		result = append(result, book.Book{
-			ID:        s.ID,
-			Tittle:    s.Tittle,
-			Publisher: s.Publisher,
-			Author:    s.Author,
-			Picture:   s.Picture,
+			ID:      s.ID,
+			Tittle:  s.Tittle,
+			Picture: s.Picture,
 		})
 	}
 

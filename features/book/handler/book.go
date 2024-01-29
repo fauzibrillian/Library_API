@@ -353,14 +353,12 @@ func (bh *BookHandler) SearchBook() echo.HandlerFunc {
 		if err != nil {
 			return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
 		}
-		var response []BookResponse
+		var response []SearchBookResponse
 		for _, result := range books {
-			response = append(response, BookResponse{
-				ID:        result.ID,
-				Tittle:    result.Tittle,
-				Publisher: result.Publisher,
-				Author:    result.Author,
-				Picture:   result.Picture,
+			response = append(response, SearchBookResponse{
+				ID:      result.ID,
+				Tittle:  result.Tittle,
+				Picture: result.Picture,
 			})
 		}
 		return c.JSON(http.StatusOK, map[string]interface{}{
