@@ -30,3 +30,9 @@ type BookPutResponse struct {
 	Author    string `json:"author" form:"author"`
 	Picture   string `json:"picture" form:"picture"`
 }
+
+type SearchBookResponse struct {
+	ID      uint   `json:"book_id"`
+	Tittle  string `json:"tittle" form:"tittle"`
+	Picture string `json:"picture" form:"picture"`
+}

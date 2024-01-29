@@ -23,6 +23,7 @@ type Handler interface {
 	ResetPassword() echo.HandlerFunc
 	UpdateUser() echo.HandlerFunc
 	Delete() echo.HandlerFunc
+	SearchUser() echo.HandlerFunc
 }
 
 type Service interface {
@@ -31,6 +32,7 @@ type Service interface {
 	ResetPassword(token *jwt.Token, input User) (User, error)
 	UpdateUser(token *jwt.Token, input User) (User, error)
 	DeleteUser(token *jwt.Token, userID uint) error
+	SearchUser(token *jwt.Token, name string, page uint, limit uint) ([]User, uint, error)
 }
 
 type Repository interface {
@@ -40,4 +42,5 @@ type Repository interface {
 	UpdateUser(input User) (User, error)
 	GetUserByID(userID uint) (*User, error)
 	DeleteUser(userID uint) error
+	SearchUser(userID uint, name string, page uint, limit uint) ([]User, uint, error)
 }

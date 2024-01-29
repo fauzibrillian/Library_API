@@ -92,3 +92,58 @@ func (bq *BookQuery) DelBook(userID uint, bookID uint) error {
 	bq.db.Where("id", bookID).Delete(&prod)
 	return nil
 }
+
+// SearchBook implements book.Repository.
+func (bq *BookQuery) SearchBook(tittle string, page uint, limit uint) ([]book.Book, uint, error) {
+	var books []BookModel
+	qry := bq.db.Table("book_models")
+
+	if tittle != "" {
+		qry = qry.Where("tittle like ?", "%"+tittle+"%")
+		qry = qry.Where("deleted_at IS NULL")
+	}
+
+	var totalBooks int64
+	if err := qry.Count(&totalBooks).Error; err != nil {
+		return nil, 0, err
+	}
+
+	offset := (page - 1) * limit
+	qry = qry.Offset(int(offset)).Limit(int(limit))
+
+	if err := qry.Find(&books).Error; err != nil {
+		return nil, 0, err
+	}
+
+	var result []book.Book
+	for _, s := range books {
+		result = append(result, book.Book{
+			ID:      s.ID,
+			Tittle:  s.Tittle,
+			Picture: s.Picture,
+		})
+	}
+
+	totalPages := int(totalBooks) / int(limit)
+	if totalBooks%int64(limit) != 0 {
+		totalPages++
+	}
+
+	return result, uint(totalPages), nil
+}
+
+// GetBook implements book.Repository.
+func (bq *BookQuery) GetBook(bookID uint) (*book.Book, error) {
+	var books BookModel
+	if err := bq.db.First(&books, bookID).Error; err != nil {
+		return nil, err
+	}
+	result := &book.Book{
+		ID:        books.ID,
+		Tittle:    books.Tittle,
+		Publisher: books.Publisher,
+		Author:    books.Author,
+		Picture:   books.Picture,
+	}
+	return result, nil
+}

@@ -331,3 +331,72 @@ func (bh *BookHandler) DeleteBook() echo.HandlerFunc {
 		})
 	}
 }
+
+// SearchBook implements book.Handler.
+func (bh *BookHandler) SearchBook() echo.HandlerFunc {
+	return func(c echo.Context) error {
+		page, err := strconv.Atoi(c.QueryParam("page"))
+		if err != nil || page <= 0 {
+			page = 1
+		}
+
+		limit, err := strconv.Atoi(c.QueryParam("limit"))
+		if err != nil || limit <= 0 {
+			limit = 10
+		}
+
+		tittle := c.QueryParam("tittle")
+		uintPage := uint(page)
+		uintLimit := uint(limit)
+
+		books, totalPage, err := bh.s.SearchBook(tittle, uintPage, uintLimit)
+		if err != nil {
+			return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
+		}
+		var response []SearchBookResponse
+		for _, result := range books {
+			response = append(response, SearchBookResponse{
+				ID:      result.ID,
+				Tittle:  result.Tittle,
+				Picture: result.Picture,
+			})
+		}
+		return c.JSON(http.StatusOK, map[string]interface{}{
+			"message":    "Get Book Successful",
+			"data":       response,
+			"pagination": map[string]interface{}{"page": page, "limit": limit, "total_page": totalPage},
+		})
+	}
+}
+
+// GetBook implements book.Handler.
+func (bh *BookHandler) GetBook() echo.HandlerFunc {
+	return func(c echo.Context) error {
+		bookID, err := strconv.ParseUint(c.Param("id"), 10, 64)
+		if err != nil {
+			return c.JSON(http.StatusBadRequest, map[string]interface{}{
+				"message": "ID book tidak valid",
+				"data":    nil,
+			})
+		}
+
+		result, err := bh.s.GetBook(uint(bookID))
+		if err != nil {
+			c.Logger().Error("Error fetching product: ", err.Error())
+			return c.JSON(http.StatusInternalServerError, map[string]interface{}{
+				"message": "Failed to retrieve product data",
+			})
+		}
+		var response = new(BookResponse)
+		response.ID = result.ID
+		response.Tittle = result.Tittle
+		response.Publisher = result.Publisher
+		response.Author = result.Author
+		response.Picture = result.Picture
+
+		return c.JSON(http.StatusOK, map[string]interface{}{
+			"message": "Get Details Books Successful",
+			"data":    response,
+		})
+	}
+}

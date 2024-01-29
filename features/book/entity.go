@@ -17,16 +17,22 @@ type Handler interface {
 	AddBook() echo.HandlerFunc
 	UpdateBook() echo.HandlerFunc
 	DeleteBook() echo.HandlerFunc
+	SearchBook() echo.HandlerFunc
+	GetBook() echo.HandlerFunc
 }
 
 type Service interface {
 	AddBook(token *jwt.Token, newBook Book) (Book, error)
 	UpdateBook(token *jwt.Token, bookID uint, input Book) (Book, error)
 	DelBook(token *jwt.Token, bookID uint) error
+	SearchBook(tittle string, page uint, limit uint) ([]Book, uint, error)
+	GetBook(bookID uint) (Book, error)
 }
 
 type Repository interface {
 	InsertBook(userID uint, newBook Book) (Book, error)
 	UpdateBook(userID uint, bookID uint, input Book) (Book, error)
 	DelBook(userID uint, bookID uint) error
+	SearchBook(tittle string, page uint, limit uint) ([]Book, uint, error)
+	GetBook(bookID uint) (*Book, error)
 }
