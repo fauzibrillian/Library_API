@@ -42,5 +42,6 @@ func RouteBook(e *echo.Echo, bh book.Handler) {
 
 func RouteTransaction(e *echo.Echo, th transaction.Handler) {
 	e.POST("/transactions", th.Borrow(), echojwt.JWT([]byte(config.InitConfig().JWT)))
+	e.GET("/transactions", th.AllTransaction(), echojwt.JWT([]byte(config.InitConfig().JWT)))
 
 }

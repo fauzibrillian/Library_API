@@ -1,7 +1,12 @@
 package repository
 
 import (
+	"fmt"
+	p "library_api/features/book"
 	"library_api/features/transaction"
+	"library_api/features/user/repository"
+	ur "library_api/features/user/repository"
+	"log"
 	"time"
 
 	"gorm.io/gorm"
@@ -40,4 +45,87 @@ func (tq *TransactionQuery) Borrow(userID uint, BookID uint) (transaction.Transa
 	result.DateBorrow = inputDB.CreatedAt
 
 	return result, nil
+}
+
+// AllTransaction implements transaction.Repository.
+func (tq *TransactionQuery) AllTransaction(userID uint, name string, page uint, limit uint) ([]transaction.Transaction, int, error) {
+	var User []ur.UserModel
+	var tm []TransactionModel
+	var result []transaction.Transaction
+
+	if name != "" {
+		if err := tq.db.Table("user_models").Where("name LIKE ?", "%"+name+"%").Find(&User).Error; err != nil {
+			return nil, 0, err
+		}
+
+		if len(User) > 0 {
+			userIDs := make([]uint, len(User))
+			for i, u := range User {
+				userIDs[i] = u.ID
+			}
+
+			offset := (page - 1) * limit
+			query := tq.db.Offset(int(offset)).Limit(int(limit)).Where("user_id IN (?)", userIDs)
+			if err := query.Find(&tm).Error; err != nil {
+				return nil, 0, err
+			}
+		}
+	} else {
+		offset := (page - 1) * limit
+		if err := tq.db.Offset(int(offset)).Limit(int(limit)).Find(&tm).Error; err != nil {
+			return nil, 0, err
+		}
+	}
+
+	var Book []p.Book
+	for _, resp := range tm {
+		// Clear slices before appending data
+		User = nil
+		Book = nil
+
+		// Fetch user details for the current transaction
+		tmp := new(repository.UserModel)
+		if err := tq.db.Table("user_models").Where("id = ?", resp.UserID).Find(&tmp).Error; err != nil {
+			return nil, 0, err
+		}
+		User = append(User, *tmp)
+
+		// Fetch book details for the current transaction
+		tmpBook := new(p.Book)
+		if err := tq.db.Table("book_models").Where("id = ?", resp.BookID).Find(&tmpBook).Error; err != nil {
+			return nil, 0, err
+		}
+		Book = append(Book, *tmpBook)
+
+		// Create a transaction object with user and book details
+		results := transaction.Transaction{
+			ID:         resp.ID,
+			BookID:     resp.BookID,
+			DateBorrow: resp.CreatedAt,
+			DateReturn: resp.DateReturn,
+			Users:      User,
+			Books:      Book,
+		}
+
+		// Append the transaction to the result slice
+		result = append(result, results)
+	}
+
+	var totalPage int
+	tableNameUser := "transaction_models"
+	columnNameUser := "deleted_at"
+	queryuser := fmt.Sprintf("SELECT COUNT(*) AS null_count FROM %s WHERE %s IS NULL", tableNameUser, columnNameUser)
+	err := tq.db.Raw(queryuser).Scan(&totalPage).Error
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	if totalPage%int(limit) == 0 {
+		totalPage = totalPage / int(limit)
+	} else {
+		totalPage = totalPage / int(limit)
+		totalPage++
+	}
+
+	return result, totalPage, err
 }

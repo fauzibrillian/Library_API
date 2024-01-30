@@ -33,3 +33,24 @@ func (ts *TransactionServices) Borrow(token *golangjwt.Token, BookID uint) (tran
 	}
 	return result, err
 }
+
+// AllTransaction implements transaction.Service.
+func (ts *TransactionServices) AllTransaction(token *golangjwt.Token, name string, page uint, limit uint) ([]transaction.Transaction, int, error) {
+	userId, rolesUser, err := jwt.ExtractToken(token)
+	if err != nil {
+		return []transaction.Transaction{}, 0, errors.New("token error")
+	}
+	if rolesUser == "" {
+		return []transaction.Transaction{}, 0, errors.New("role cannot empty")
+	}
+	if rolesUser != "admin" {
+		return []transaction.Transaction{}, 0, errors.New("unauthorized access: admin role required")
+	}
+
+	result, totalPage, err := ts.repo.AllTransaction(userId, name, page, limit)
+	if err != nil {
+		return []transaction.Transaction{}, 0, errors.New("failed to update the product")
+	}
+
+	return result, totalPage, nil
+}
