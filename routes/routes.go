@@ -3,6 +3,7 @@ package routes
 import (
 	"library_api/config"
 	"library_api/features/book"
+	"library_api/features/transaction"
 	"library_api/features/user"
 
 	echojwt "github.com/labstack/echo-jwt/v4"
@@ -10,7 +11,7 @@ import (
 	"github.com/labstack/echo/v4/middleware"
 )
 
-func InitRoute(e *echo.Echo, uc user.Handler, bh book.Handler) {
+func InitRoute(e *echo.Echo, uc user.Handler, bh book.Handler, th transaction.Handler) {
 	e.Pre(middleware.RemoveTrailingSlash())
 
 	e.Use(middleware.CORS())
@@ -18,6 +19,7 @@ func InitRoute(e *echo.Echo, uc user.Handler, bh book.Handler) {
 
 	RouteUser(e, uc)
 	RouteBook(e, bh)
+	RouteTransaction(e, th)
 }
 
 func RouteUser(e *echo.Echo, uc user.Handler) {
@@ -36,4 +38,10 @@ func RouteBook(e *echo.Echo, bh book.Handler) {
 	e.DELETE("/books/:id", bh.DeleteBook(), echojwt.JWT([]byte(config.InitConfig().JWT)))
 	e.GET("/books", bh.SearchBook())
 	e.GET("/books/:id", bh.GetBook())
+}
+
+func RouteTransaction(e *echo.Echo, th transaction.Handler) {
+	e.POST("/transactions", th.Borrow(), echojwt.JWT([]byte(config.InitConfig().JWT)))
+	e.GET("/transactions", th.AllTransaction(), echojwt.JWT([]byte(config.InitConfig().JWT)))
+
 }
