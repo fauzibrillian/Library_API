@@ -29,7 +29,7 @@ func (ts *TransactionServices) Borrow(token *golangjwt.Token, BookID uint) (tran
 	}
 	result, err := ts.repo.Borrow(userID, BookID)
 	if err != nil {
-		return transaction.Transaction{}, errors.New("Repository Error")
+		return transaction.Transaction{}, errors.New("repository Error")
 	}
 	return result, err
 }
@@ -53,4 +53,23 @@ func (ts *TransactionServices) AllTransaction(token *golangjwt.Token, name strin
 	}
 
 	return result, totalPage, nil
+}
+
+// UpdateReturn implements transaction.Service.
+func (ts *TransactionServices) UpdateReturn(token *golangjwt.Token, transactionID uint, input transaction.Transaction) ([]transaction.Transaction, error) {
+	userId, rolesUser, err := jwt.ExtractToken(token)
+	if err != nil {
+		return []transaction.Transaction{}, errors.New("token error")
+	}
+	if rolesUser == "" {
+		return []transaction.Transaction{}, errors.New("role cannot empty")
+	}
+	if rolesUser != "admin" {
+		return []transaction.Transaction{}, errors.New("unauthorized access: admin role required")
+	}
+	result, err := ts.repo.UpdateReturn(userId, transactionID, input)
+	if err != nil {
+		return []transaction.Transaction{}, errors.New("repository Error")
+	}
+	return result, err
 }

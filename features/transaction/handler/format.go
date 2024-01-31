@@ -21,3 +21,16 @@ type SearchTransactionResponse struct {
 	DateBorrow  time.Time `json:"date_borrow"`
 	DateReturn  time.Time `json:"date_return"`
 }
+
+type DateReturnRequest struct {
+	ID         int       `json:"transaction_id" form:"transaction_id"`
+	DateReturn time.Time `json:"date_return" form:"date_return"`
+}
+
+type DateReturnResponse struct {
+	ID         int       `json:"transaction_id"`
+	UserName   string    `json:"user_name" form:"user_name"`
+	TittleBook string    `json:"tittle_books" form:"tittle_books"`
+	DateBorrow time.Time `json:"date_borrow"`
+	DateReturn time.Time `json:"date_return"`
+}

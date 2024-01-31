@@ -21,14 +21,17 @@ type Transaction struct {
 type Handler interface {
 	Borrow() echo.HandlerFunc
 	AllTransaction() echo.HandlerFunc
+	UpdateReturn() echo.HandlerFunc
 }
 
 type Repository interface {
 	Borrow(userID uint, BookID uint) (Transaction, error)
 	AllTransaction(userID uint, name string, page uint, limit uint) ([]Transaction, int, error)
+	UpdateReturn(userID uint, transactionID uint, input Transaction) ([]Transaction, error)
 }
 
 type Service interface {
 	Borrow(token *jwt.Token, BookID uint) (Transaction, error)
 	AllTransaction(token *jwt.Token, name string, page uint, limit uint) ([]Transaction, int, error)
+	UpdateReturn(token *jwt.Token, transactionID uint, input Transaction) ([]Transaction, error)
 }
