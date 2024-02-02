@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"errors"
 	"fmt"
 	p "library_api/features/book"
 	"library_api/features/transaction"
@@ -27,6 +28,55 @@ func New(db *gorm.DB) transaction.Repository {
 	return &TransactionQuery{
 		db: db,
 	}
+}
+
+// UpdateReturn implements transaction.Repository.
+func (tq *TransactionQuery) UpdateReturn(userID uint, transactionID uint, input transaction.Transaction) ([]transaction.Transaction, error) {
+	var update TransactionModel
+	var User []ur.UserModel
+	var result []transaction.Transaction
+	var Book []p.Book
+
+	if err := tq.db.First(&update, transactionID).Error; err != nil {
+		return []transaction.Transaction{}, err
+	}
+
+	if update.ID == 0 {
+		err := errors.New("transaction tidak ditemukan")
+		return []transaction.Transaction{}, err
+	}
+	if input.DateReturn != (time.Time{}) {
+		update.DateReturn = input.DateReturn
+	}
+
+	if err := tq.db.Save(&update).Error; err != nil {
+		return []transaction.Transaction{}, err
+	}
+
+	tmpUser := new(repository.UserModel)
+	if err := tq.db.Table("user_models").Where("id = ?", update.UserID).Find(&tmpUser).Error; err != nil {
+		return []transaction.Transaction{}, err
+	}
+	User = append(User, *tmpUser)
+
+	tmpBook := new(p.Book)
+	if err := tq.db.Table("book_models").Where("id = ?", update.BookID).Find(&tmpBook).Error; err != nil {
+		return []transaction.Transaction{}, err
+	}
+	Book = append(Book, *tmpBook)
+
+	// Create a transaction object with user and book details
+	resultTransaction := transaction.Transaction{
+		ID:         update.ID,
+		BookID:     update.BookID,
+		DateBorrow: update.CreatedAt,
+		DateReturn: update.DateReturn,
+		Users:      User,
+		Books:      Book,
+	}
+
+	result = append(result, resultTransaction)
+	return result, nil
 }
 
 // Borrow implements transaction.Repository.
