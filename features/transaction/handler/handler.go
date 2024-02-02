@@ -125,3 +125,61 @@ func (th *TransactionHandler) AllTransaction() echo.HandlerFunc {
 		})
 	}
 }
+
+// UpdateReturn implements transaction.Handler.
+func (th *TransactionHandler) UpdateReturn() echo.HandlerFunc {
+	return func(c echo.Context) error {
+		var input = new(DateReturnRequest)
+		transactionID, err := strconv.ParseUint(c.Param("id"), 10, 64)
+		if err != nil {
+			return c.JSON(http.StatusBadRequest, map[string]interface{}{
+				"message": "ID user tidak valid",
+				"data":    nil,
+			})
+		}
+		if err := c.Bind(input); err != nil {
+			return c.JSON(http.StatusBadRequest, map[string]any{
+				"message": "input yang diberikan tidak sesuai",
+				"data":    nil,
+			})
+		}
+		updateDate := transaction.Transaction{
+			ID:         uint(input.ID),
+			DateReturn: input.DateReturn,
+		}
+		transaction, err := th.s.UpdateReturn(c.Get("user").(*golangjwt.Token), uint(transactionID), updateDate)
+		if err != nil {
+			return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
+		}
+
+		// slicing data user
+		var userNames []string
+		var bookTitles []string
+
+		for _, transaction := range transaction {
+			for _, user := range transaction.Users {
+				userNames = append(userNames, user.Name)
+			}
+			for _, book := range transaction.Books {
+				bookTitles = append(bookTitles, book.Tittle)
+			}
+		}
+
+		// slicing data to response
+		var responses []DateReturnResponse
+		for x, result := range transaction {
+			responses = append(responses, DateReturnResponse{
+				ID:         int(result.ID),
+				UserName:   userNames[x],
+				TittleBook: bookTitles[x],
+				DateBorrow: result.DateBorrow,
+				DateReturn: result.DateReturn,
+			})
+		}
+
+		return c.JSON(http.StatusOK, map[string]interface{}{
+			"message": "Update Date Return Transactions Book Successful",
+			"data":    responses,
+		})
+	}
+}
