@@ -2,12 +2,16 @@ package service_test
 
 import (
 	"errors"
+	"library_api/config"
 	"library_api/features/user"
 	"library_api/features/user/mocks"
 	"library_api/features/user/service"
 	eMock "library_api/helper/enkrip/mocks"
+	golangjwt "library_api/helper/jwt"
+
 	"testing"
 
+	"github.com/golang-jwt/jwt/v5"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -195,5 +199,36 @@ func TestLogin(t *testing.T) {
 
 		repo.AssertExpectations(t)
 		hashMock.AssertExpectations(t)
+	})
+}
+
+func TestResetPassword(t *testing.T) {
+	repoMock := mocks.NewRepository(t)
+	enkrip := eMock.NewHashInterface(t)
+
+	userService := service.New(repoMock, enkrip)
+	t.Run("Success Case", func(t *testing.T) {
+		var userID = uint(1)
+		var rolesUser = "admin"
+		var str, _ = golangjwt.GenerateJWT(userID, rolesUser)
+		var token, _ = jwt.Parse(str, func(t *jwt.Token) (interface{}, error) {
+			return []byte(config.InitConfig().JWT), nil
+		})
+
+		input := user.User{ID: uint(1), NewPassword: "newpass"}
+		baseUser := user.User{ID: uint(1), Password: "oldpass"}
+		repoMock.On("GetUserByID", uint(1)).Return(&baseUser, nil).Once()
+		enkrip.On("HashPassword", "newpass").Return("hashednewpass", nil).Once()
+		input.NewPassword = "hashednewpass"
+		repoMock.On("ResetPassword", input).Return(user.User{ID: uint(1), Password: "hashednewpass"}, nil).Once()
+
+		input.NewPassword = "newpass"
+		resetPassword, err := userService.ResetPassword(token, input)
+
+		assert.NoError(t, err)
+		assert.Equal(t, user.User{ID: uint(1), Password: "hashednewpass"}, resetPassword)
+
+		repoMock.AssertExpectations(t)
+		enkrip.AssertExpectations(t)
 	})
 }
