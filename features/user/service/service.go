@@ -77,7 +77,7 @@ func (us *UserService) Register(newUser user.User) (user.User, error) {
 }
 
 // ResetPassword implements user.Service.
-func (us UserService) ResetPassword(token *golangjwt.Token, input user.User) (user.User, error) {
+func (us *UserService) ResetPassword(token *golangjwt.Token, input user.User) (user.User, error) {
 	userID, rolesUser, err := jwt.ExtractToken(token)
 	if err != nil {
 		return user.User{}, errors.New("harap login")
@@ -164,7 +164,7 @@ func (us *UserService) DeleteUser(token *golangjwt.Token, userID uint) error {
 	}
 	err = us.repo.DeleteUser(userID)
 	if err != nil {
-		return errors.New("failed to delete the user")
+		return errors.New("repository error")
 	}
 
 	return nil

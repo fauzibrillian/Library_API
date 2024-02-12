@@ -248,7 +248,7 @@ func TestResetPassword(t *testing.T) {
 		repoMock.AssertExpectations(t)
 	})
 
-	t.Run("Failed Case - Login Required", func(t *testing.T) {
+	t.Run("Failed Case - Wrong ID", func(t *testing.T) {
 		var userID = uint(3)
 		var rolesUser = "user"
 		var str, _ = golangjwt.GenerateJWT(userID, rolesUser, "rahasiabanget")
@@ -373,4 +373,262 @@ func TestResetPassword(t *testing.T) {
 		repoMock.AssertExpectations(t)
 		enkrip.AssertExpectations(t)
 	})
+}
+
+func TestUpdateUser(t *testing.T) {
+	repoMock := mocks.NewRepository(t)
+
+	userService := service.New(repoMock, nil)
+	t.Run("Success Case", func(t *testing.T) {
+		var userID = uint(1)
+		var rolesUser = "admin"
+		var str, _ = golangjwt.GenerateJWT(userID, rolesUser, "rahasiabanget")
+		var token, _ = jwt.Parse(str, func(t *jwt.Token) (interface{}, error) {
+			return []byte("rahasiabanget"), nil
+		})
+
+		input := user.User{
+			ID:     uint(1),
+			Name:   "UpdatedUser",
+			Email:  "updatedemail@gmail.com",
+			Avatar: "https://cloudinary.com",
+			Role:   "admin",
+		}
+		baseUser := user.User{ID: uint(1), Name: "Budi", Email: "budi@gmail.com", Avatar: "https://cloudinary.com", Role: "admin"}
+		repoMock.On("GetUserByID", userID).Return(&baseUser, nil).Once()
+		repoMock.On("UpdateUser", input).Return(input, nil).Once()
+
+		updatedUser, err := userService.UpdateUser(token, input)
+		assert.NoError(t, err)
+		assert.Equal(t, user.User{ID: uint(1), Name: "UpdatedUser", Email: "updatedemail@gmail.com", Avatar: "https://cloudinary.com", Role: "admin"}, updatedUser)
+
+		repoMock.AssertExpectations(t)
+
+	})
+	t.Run("Failed Case - Login Required", func(t *testing.T) {
+		var userID = uint(2)
+		var rolesUser = "user"
+		var str, _ = golangjwt.GenerateJWT(userID, rolesUser, "rahasiabanget")
+		var token, _ = jwt.Parse(str, func(t *jwt.Token) (interface{}, error) {
+			return nil, nil
+		})
+		input := user.User{
+			ID:     uint(1),
+			Name:   "UpdatedUser",
+			Email:  "updatedemail@gmail.com",
+			Avatar: "https://cloudinary.com",
+			Role:   "admin",
+		}
+		users, err := userService.UpdateUser(token, input)
+
+		assert.Error(t, err)
+		assert.Equal(t, user.User{}, users)
+
+		repoMock.AssertExpectations(t)
+	})
+
+	t.Run("Failed Case - Wrong ID", func(t *testing.T) {
+		var userID = uint(3)
+		var rolesUser = "user"
+		var str, _ = golangjwt.GenerateJWT(userID, rolesUser, "rahasiabanget")
+		var token, _ = jwt.Parse(str, func(t *jwt.Token) (interface{}, error) {
+			return []byte("rahasiabanget"), nil
+		})
+		input := user.User{
+			ID:     uint(1),
+			Name:   "UpdatedUser",
+			Email:  "updatedemail@gmail.com",
+			Avatar: "https://cloudinary.com",
+			Role:   "user",
+		}
+
+		users, err := userService.UpdateUser(token, input)
+
+		assert.Error(t, err)
+		assert.Equal(t, user.User{}, users)
+
+		repoMock.AssertExpectations(t)
+	})
+
+	t.Run("Failed Case - User not Found", func(t *testing.T) {
+		var userID = uint(1)
+		var rolesUser = "admin"
+		var str, _ = golangjwt.GenerateJWT(userID, rolesUser, "rahasiabanget")
+		var token, _ = jwt.Parse(str, func(t *jwt.Token) (interface{}, error) {
+			return []byte("rahasiabanget"), nil
+		})
+		input := user.User{
+			ID:     uint(1),
+			Name:   "UpdatedUser",
+			Email:  "updatedemail@gmail.com",
+			Avatar: "https://cloudinary.com",
+			Role:   "user",
+		}
+
+		repoMock.On("GetUserByID", uint(1)).Return(nil, errors.New("user tidak ditemukan")).Once()
+
+		users, err := userService.UpdateUser(token, input)
+
+		assert.Error(t, err)
+		assert.Equal(t, user.User{}, users)
+
+		repoMock.AssertExpectations(t)
+	})
+
+	t.Run("Failed Case - Repository Error", func(t *testing.T) {
+		var userID = uint(1)
+		var rolesUser = "admin"
+		var str, _ = golangjwt.GenerateJWT(userID, rolesUser, "rahasiabanget")
+		var token, _ = jwt.Parse(str, func(t *jwt.Token) (interface{}, error) {
+			return []byte("rahasiabanget"), nil
+		})
+		input := user.User{
+			ID:     uint(1),
+			Name:   "UpdatedUser",
+			Email:  "updatedemail@gmail.com",
+			Avatar: "https://cloudinary.com",
+			Role:   "admin",
+		}
+		baseUser := user.User{ID: uint(1), Name: "", Email: "", Avatar: "", Role: ""}
+
+		repoMock.On("GetUserByID", uint(1)).Return(&baseUser, nil).Once()
+		repoMock.On("UpdateUser", input).Return(input, errors.New("kesalahan pada database")).Once()
+
+		users, err := userService.UpdateUser(token, input)
+
+		assert.Error(t, err)
+		assert.Equal(t, user.User{}, users)
+
+		repoMock.AssertExpectations(t)
+	})
+}
+
+func TestDeleteUser(t *testing.T) {
+	repoMock := mocks.NewRepository(t)
+	userService := service.New(repoMock, nil)
+
+	t.Run("Success Case", func(t *testing.T) {
+		var userID = uint(1)
+		var rolesUser = "admin"
+		var str, _ = golangjwt.GenerateJWT(userID, rolesUser, "rahasiabanget")
+		var token, _ = jwt.Parse(str, func(t *jwt.Token) (interface{}, error) {
+			return []byte("rahasiabanget"), nil
+		})
+
+		repoMock.On("GetUserByID", userID).Return(&user.User{ID: uint(1)}, nil).Once()
+		repoMock.On("DeleteUser", userID).Return(nil).Once()
+		err := userService.DeleteUser(token, userID)
+
+		assert.Nil(t, err)
+		assert.NoError(t, err)
+		repoMock.AssertExpectations(t)
+	})
+
+	t.Run("Failed Case - Login Required", func(t *testing.T) {
+		var userID = uint(2)
+		var rolesUser = "admin"
+		var str, _ = golangjwt.GenerateJWT(userID, rolesUser, "rahasiabanget")
+		var token, _ = jwt.Parse(str, func(t *jwt.Token) (interface{}, error) {
+			return nil, nil
+		})
+		err := userService.DeleteUser(token, userID)
+
+		assert.Error(t, err)
+
+	})
+
+	t.Run("Failed Case - Empty Role", func(t *testing.T) {
+		var userID = uint(1)
+		var rolesUser = ""
+		var str, _ = golangjwt.GenerateJWT(userID, rolesUser, "rahasiabanget")
+		var token, _ = jwt.Parse(str, func(t *jwt.Token) (interface{}, error) {
+			return []byte("rahasiabanget"), nil
+		})
+		err := userService.DeleteUser(token, userID)
+
+		assert.Error(t, err)
+
+	})
+
+	t.Run("Failed Case - No Permission", func(t *testing.T) {
+		var userID = uint(3)
+		var rolesUser = "user"
+		var str, _ = golangjwt.GenerateJWT(userID, rolesUser, "rahasiabanget")
+		var token, _ = jwt.Parse(str, func(t *jwt.Token) (interface{}, error) {
+			return []byte("rahasiabanget"), nil
+		})
+		err := userService.DeleteUser(token, uint(1))
+
+		assert.Error(t, err)
+
+	})
+
+	t.Run("Failed Case - Empty User ID", func(t *testing.T) {
+		var userID = uint(1)
+		var rolesUser = "admin"
+		var str, _ = golangjwt.GenerateJWT(userID, rolesUser, "rahasiabanget")
+		var token, _ = jwt.Parse(str, func(t *jwt.Token) (interface{}, error) {
+			return []byte("rahasiabanget"), nil
+		})
+		repoMock.On("GetUserByID", userID).Return(nil, errors.New("failed to retrieve the user for deletion")).Once()
+
+		err := userService.DeleteUser(token, userID)
+
+		assert.Error(t, err)
+
+	})
+
+	t.Run("Failed Case - UserID not equal ID User", func(t *testing.T) {
+		var userID = uint(1)
+		var rolesUser = "user"
+		var str, _ = golangjwt.GenerateJWT(userID, rolesUser, "rahasiabanget")
+		var token, _ = jwt.Parse(str, func(t *jwt.Token) (interface{}, error) {
+			return []byte("rahasiabanget"), nil
+		})
+		repoMock.On("GetUserByID", userID).Return(&user.User{ID: uint(2), Role: "user"}, nil).Once()
+
+		err := userService.DeleteUser(token, userID)
+
+		assert.Error(t, err)
+	})
+
+	t.Run("Failed Case - Repository Error", func(t *testing.T) {
+		var userID = uint(1)
+		var rolesUser = "admin"
+		var str, _ = golangjwt.GenerateJWT(userID, rolesUser, "rahasiabanget")
+		var token, _ = jwt.Parse(str, func(t *jwt.Token) (interface{}, error) {
+			return []byte("rahasiabanget"), nil
+		})
+
+		repoMock.On("GetUserByID", userID).Return(&user.User{ID: uint(2), Role: "user"}, nil).Once()
+		repoMock.On("DeleteUser", userID).Return(errors.New("repository error")).Once()
+
+		err := userService.DeleteUser(token, userID)
+
+		assert.Error(t, err)
+	})
+}
+
+func TestSearchUser(t *testing.T) {
+	repoMock := mocks.NewRepository(t)
+	userService := service.New(repoMock, nil)
+
+	t.Run("Success Case", func(t *testing.T) {
+		var userID = uint(1)
+		var rolesUser = "admin"
+		var str, _ = golangjwt.GenerateJWT(userID, rolesUser, "rahasiabanget")
+		var token, _ = jwt.Parse(str, func(t *jwt.Token) (interface{}, error) {
+			return []byte("rahasiabanget"), nil
+		})
+		expectedUsers := []user.User{{ID: 1, Name: "User1"}, {ID: 2, Name: "User2"}}
+		expectedTotalPage := uint(3)
+
+		repoMock.On("SearchUser", userID, "User1", uint(1), uint(10)).Return(expectedUsers, expectedTotalPage, nil).Once()
+		users, totalPage, err := userService.SearchUser(token, "User1", uint(1), uint(10))
+		assert.NoError(t, err)
+		assert.Equal(t, expectedUsers, users)
+		assert.Equal(t, expectedTotalPage, totalPage)
+	})
+
+	// t.Run()
 }
