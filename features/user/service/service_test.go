@@ -630,5 +630,50 @@ func TestSearchUser(t *testing.T) {
 		assert.Equal(t, expectedTotalPage, totalPage)
 	})
 
-	// t.Run()
+	t.Run("Failed Case - Login Required", func(t *testing.T) {
+		var userID = uint(1)
+		var rolesUser = "admin"
+		var str, _ = golangjwt.GenerateJWT(userID, rolesUser, "rahasiabanget")
+		var token, _ = jwt.Parse(str, func(t *jwt.Token) (interface{}, error) {
+			return nil, nil
+		})
+
+		users, totalPage, err := userService.SearchUser(token, "User1", uint(1), uint(10))
+		assert.Error(t, err)
+		assert.Equal(t, []user.User{}, users)
+		assert.Equal(t, uint(0), totalPage)
+	})
+
+	t.Run("Failed Case - Admin Required", func(t *testing.T) {
+		var userID = uint(3)
+		var rolesUser = "user"
+		var str, _ = golangjwt.GenerateJWT(userID, rolesUser, "rahasiabanget")
+		var token, _ = jwt.Parse(str, func(t *jwt.Token) (interface{}, error) {
+			return []byte("rahasiabanget"), nil
+		})
+
+		users, totalPage, err := userService.SearchUser(token, "User1", uint(1), uint(10))
+		assert.Error(t, err)
+		assert.Equal(t, []user.User{}, users)
+		assert.Equal(t, uint(0), totalPage)
+	})
+
+	t.Run("Failed Case - Repository Error", func(t *testing.T) {
+		var userID = uint(1)
+		var rolesUser = "admin"
+		var str, _ = golangjwt.GenerateJWT(userID, rolesUser, "rahasiabanget")
+		var token, _ = jwt.Parse(str, func(t *jwt.Token) (interface{}, error) {
+			return []byte("rahasiabanget"), nil
+		})
+		repoMock.On("SearchUser", userID, "User1", uint(1), uint(10)).Return(nil, uint(0), errors.New("repository error")).Once()
+
+		users, totalPage, err := userService.SearchUser(token, "User1", uint(1), uint(10))
+		assert.Error(t, err)
+		assert.Equal(t, []user.User([]user.User(nil)), users)
+		assert.Equal(t, uint(0), totalPage)
+		assert.Equal(t, "repository error", err.Error())
+
+		repoMock.AssertExpectations(t)
+
+	})
 }

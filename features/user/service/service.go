@@ -182,7 +182,7 @@ func (us *UserService) SearchUser(token *golangjwt.Token, name string, page uint
 
 	users, totalPage, err := us.repo.SearchUser(userId, name, page, limit)
 	if err != nil {
-		return nil, 0, err
+		return nil, 0, errors.New("repository error")
 	}
 
 	return users, totalPage, err
