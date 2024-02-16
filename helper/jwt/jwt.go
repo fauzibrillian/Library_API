@@ -2,25 +2,24 @@ package jwt
 
 import (
 	"errors"
-	"library_api/config"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
 )
 
 type JWTService interface {
-	GenerateJWT(idUser uint, rolesUser string) (string, error)
+	GenerateJWT(idUser uint, rolesUser string, key string) (string, error)
 	ExtractToken(t *jwt.Token) (uint, string, error)
 }
 
-func GenerateJWT(idUser uint, rolesUser string) (string, error) {
+func GenerateJWT(idUser uint, rolesUser string, key string) (string, error) {
 	var claim = jwt.MapClaims{}
 	claim["id"] = idUser
 	claim["role"] = rolesUser
 	claim["iat"] = time.Now().UnixMilli()
 	claim["exp"] = time.Now().Add(time.Minute * 30).UnixMilli()
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claim)
-	strToken, err := token.SignedString([]byte(config.InitConfig().JWT))
+	strToken, err := token.SignedString([]byte(key))
 	if err != nil {
 		return "", err
 	}

@@ -164,7 +164,7 @@ func (us *UserService) DeleteUser(token *golangjwt.Token, userID uint) error {
 	}
 	err = us.repo.DeleteUser(userID)
 	if err != nil {
-		return errors.New("failed to delete the user")
+		return errors.New("repository error")
 	}
 
 	return nil
@@ -182,7 +182,7 @@ func (us *UserService) SearchUser(token *golangjwt.Token, name string, page uint
 
 	users, totalPage, err := us.repo.SearchUser(userId, name, page, limit)
 	if err != nil {
-		return nil, 0, err
+		return nil, 0, errors.New("repository error")
 	}
 
 	return users, totalPage, err

@@ -3,6 +3,7 @@ package handler
 import (
 	"context"
 	"errors"
+	"library_api/config"
 	"library_api/features/user"
 	"library_api/helper/cld"
 	"library_api/helper/jwt"
@@ -60,7 +61,7 @@ func (uc *UserController) Login() echo.HandlerFunc {
 			})
 		}
 
-		strToken, err := jwt.GenerateJWT(result.ID, result.Role)
+		strToken, err := jwt.GenerateJWT(result.ID, result.Role, config.InitConfig().JWT)
 		if err != nil {
 			return c.JSON(http.StatusInternalServerError, map[string]any{
 				"message": "terjadi permasalahan ketika mengenkripsi data",
