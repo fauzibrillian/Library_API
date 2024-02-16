@@ -42,9 +42,6 @@ func (bs *BookServices) UpdateBook(token *golangjwt.Token, bookID uint, input bo
 	if err != nil {
 		return book.Book{}, errors.New("token error")
 	}
-	if rolesUser == "" {
-		return book.Book{}, errors.New("role cannot empty")
-	}
 	if rolesUser != "admin" {
 		return book.Book{}, errors.New("unauthorized access: admin role required")
 	}
