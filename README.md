@@ -37,6 +37,10 @@ Install dependency
 go mod tidy
 ```
 
+## Cloudinary API Key
+
+Ensure you have an Cloudinary API key for accessing storage file. Add the API key to your configuration file.
+
 ## ERD
 ![alt text](image.png)
 
